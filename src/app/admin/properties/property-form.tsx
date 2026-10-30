@@ -147,7 +147,7 @@ export function PropertyForm({ property }: { property?: Property }) {
         </div>
         <div>
           <label htmlFor={`${id}-price_from`} className="label">
-            Starting price in ₹ <span className="font-normal text-slate-400">(for sorting; blank if per sq.ft)</span>
+            Starting price in ₹ <span className="font-normal text-slate-500">(for sorting; blank if per sq.ft)</span>
           </label>
           <input {...f("price_from")} defaultValue={property?.price_from ?? ""} inputMode="numeric" className="field" placeholder="775000" />
           {errorFor("price_from")}
@@ -159,7 +159,7 @@ export function PropertyForm({ property }: { property?: Property }) {
         </div>
         <div className="sm:col-span-2">
           <label htmlFor={`${id}-amenities`} className="label">
-            Amenities <span className="font-normal text-slate-400">(one per line)</span>
+            Amenities <span className="font-normal text-slate-500">(one per line)</span>
           </label>
           <textarea {...f("amenities")} defaultValue={property?.amenities.join("\n")} rows={6} className="field" placeholder={"Gated Community\nCCTV\nChildren's Park"} />
           {errorFor("amenities")}
@@ -220,7 +220,7 @@ export function PropertyForm({ property }: { property?: Property }) {
         </div>
         <div>
           <label htmlFor={`${id}-contact_phones`} className="label">
-            Phone numbers <span className="font-normal text-slate-400">(comma separated)</span>
+            Phone numbers <span className="font-normal text-slate-500">(comma separated)</span>
           </label>
           <input {...f("contact_phones")} defaultValue={property?.contact_phones.join(", ")} className="field" placeholder="9043934675, 9655669675" />
           {errorFor("contact_phones")}
@@ -237,7 +237,7 @@ export function PropertyForm({ property }: { property?: Property }) {
         </div>
         <div className="sm:col-span-2">
           <label htmlFor={`${id}-map_embed_url`} className="label">
-            Google Maps embed link <span className="font-normal text-slate-400">(Maps → Share → Embed a map → copy the src=&quot;…&quot; URL)</span>
+            Google Maps embed link <span className="font-normal text-slate-500">(Maps → Share → Embed a map → copy the src=&quot;…&quot; URL)</span>
           </label>
           <input {...f("map_embed_url")} defaultValue={property?.map_embed_url ?? ""} className="field" placeholder="https://www.google.com/maps/embed?pb=…" />
           {errorFor("map_embed_url")}

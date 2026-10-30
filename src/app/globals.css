@@ -19,9 +19,10 @@
   --color-gold-400: #dcab52;
   --color-gold-500: #c8963e;
   --color-gold-600: #a77a2c;
+  --color-gold-700: #86611f;
   --color-sand-50: #fbfaf7;
   --color-sand-100: #f4f1ea;
-  --color-whatsapp: #16a34a;
+  --color-whatsapp: #15803d;
 
   --shadow-card: 0 1px 2px rgb(11 31 58 / 0.06), 0 8px 24px -12px rgb(11 31 58 / 0.18);
   --shadow-lift: 0 2px 4px rgb(11 31 58 / 0.08), 0 20px 40px -16px rgb(11 31 58 / 0.3);
@@ -54,7 +55,7 @@
   @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
 }
 @utility eyebrow {
-  @apply text-xs font-semibold tracking-[0.18em] text-gold-600 uppercase;
+  @apply text-xs font-semibold tracking-[0.18em] text-gold-700 uppercase;
 }
 @utility btn {
   @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60;
@@ -72,13 +73,134 @@
   @apply btn border border-white/40 text-white hover:bg-white/10;
 }
 @utility btn-whatsapp {
-  @apply btn bg-whatsapp text-white hover:bg-green-700;
+  @apply btn bg-whatsapp text-white hover:bg-green-800;
 }
 @utility field {
   @apply block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-base text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none aria-invalid:border-red-500 sm:text-sm;
 }
 @utility label {
   @apply mb-1.5 block text-sm font-medium text-slate-700;
+}
+
+@utility btn-glass {
+  @apply btn border border-white/25 bg-white/10 text-white backdrop-blur-md hover:bg-white/20;
+}
+
+/* ---------- Motion ----------
+   Everything here is CSS-only (no animation library, no JS on the main thread)
+   and switched off for people who ask their OS for reduced motion. */
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes hero-cycle {
+  0% {
+    opacity: 0;
+    transform: scale(1.12);
+  }
+  6% {
+    opacity: 1;
+  }
+  25% {
+    opacity: 1;
+  }
+  31% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes header-raise {
+  to {
+    box-shadow: 0 8px 30px -12px rgb(11 31 58 / 0.25);
+  }
+}
+@keyframes grow-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Hero slideshow: four photos crossfade with a slow zoom ("Ken Burns").
+   24s cycle, each slide on screen for 6s; the negative offset makes the
+   first photo visible on the very first frame so it can be the LCP image. */
+.hero-slide:not(:first-child) {
+  opacity: 0;
+}
+/* Hidden unless the browser can drive it from scroll position. */
+.scroll-progress {
+  transform: scaleX(0);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-slide {
+    animation: hero-cycle 24s linear infinite both;
+    animation-delay: calc(var(--i, 0) * 6s - 1.5s);
+  }
+
+  /* Staggered entrance for above-the-fold content. */
+  .enter {
+    animation: fade-up 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: calc(var(--d, 0) * 120ms + 100ms);
+  }
+
+  .marquee-track {
+    animation: marquee 40s linear infinite;
+  }
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+
+  /* Scroll-driven animations run on the compositor, tied to scroll position
+     rather than time. Browsers without support simply show the content. */
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: fade-up linear both;
+      animation-timeline: view();
+      animation-range: entry 5% entry 85%;
+    }
+    .site-header {
+      animation: header-raise linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 120px;
+    }
+    .scroll-progress {
+      animation: grow-x linear both;
+      animation-timeline: scroll(root);
+    }
+  }
+}
+
+/* Shared-element morph (property card photo -> gallery). See components/property-card.tsx. */
+::view-transition-group(.morph) {
+  animation-duration: 450ms;
+  animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+::view-transition-image-pair(.morph) {
+  animation-name: via-blur;
+}
+@keyframes via-blur {
+  30% {
+    filter: blur(3px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -88,5 +210,74 @@
   *, ::before, ::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* Range slider: filled track up to the thumb (--pct is set inline). */
+.range {
+  appearance: none;
+  height: 1.5rem;
+  background: transparent;
+  cursor: pointer;
+}
+.range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--color-brand-600) var(--pct), var(--color-slate-200) var(--pct));
+}
+.range::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--color-brand-600) var(--pct), var(--color-slate-200) var(--pct));
+}
+.range::-webkit-slider-thumb {
+  appearance: none;
+  margin-top: -8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: white;
+  border: 3px solid var(--color-brand-600);
+  box-shadow: 0 2px 6px rgb(11 31 58 / 0.25);
+  transition: transform 150ms;
+}
+.range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: white;
+  border: 3px solid var(--color-brand-600);
+}
+.range:active::-webkit-slider-thumb {
+  transform: scale(1.15);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Project page: skeleton leaves quickly, content arrives a beat later. */
+::view-transition-old(.slide-down) {
+  animation: 150ms ease-out both vt-fade reverse, 150ms ease-out both vt-slide reverse;
+}
+::view-transition-new(.slide-up) {
+  animation: 210ms ease-in 150ms both vt-fade, 400ms cubic-bezier(0.2, 0.7, 0.2, 1) both vt-slide;
+}
+@keyframes vt-fade {
+  from {
+    opacity: 0;
+    filter: blur(3px);
+  }
+}
+@keyframes vt-slide {
+  from {
+    transform: translateY(16px);
   }
 }

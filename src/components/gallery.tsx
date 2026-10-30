@@ -2,9 +2,10 @@
 
 import { ChevronLeft, ChevronRight, Expand, X } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, ViewTransition } from "react";
+import { photoTransitionName } from "./property-card";
 
-export function Gallery({ images, name }: { images: string[]; name: string }) {
+export function Gallery({ images, name, slug }: { images: string[]; name: string; slug: string }) {
   const [index, setIndex] = useState(0);
   const [lightbox, setLightbox] = useState(false);
   const thumbs = useRef<HTMLDivElement>(null);
@@ -49,15 +50,19 @@ export function Gallery({ images, name }: { images: string[]; name: string }) {
   return (
     <div className="space-y-3">
       <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-200 sm:aspect-[16/10]" {...swipe}>
-        <Image
-          key={images[index]}
-          src={images[index]}
-          alt={`${name} – photo ${index + 1} of ${count}`}
-          fill
-          priority={index === 0}
-          sizes="(min-width: 1024px) 760px, 100vw"
-          className="object-cover"
-        />
+        <ViewTransition name={photoTransitionName(slug)} share="morph" default="none">
+          <div className="absolute inset-0 overflow-hidden">
+            <Image
+              key={images[index]}
+              src={images[index]}
+              alt={`${name} – photo ${index + 1} of ${count}`}
+              fill
+              priority={index === 0}
+              sizes="(min-width: 1024px) 760px, 100vw"
+              className="animate-[fade-in_400ms_ease-out] object-cover"
+            />
+          </div>
+        </ViewTransition>
         <NavButtons count={count} go={go} />
         <div className="absolute right-3 bottom-3 flex items-center gap-2">
           <span className="rounded-full bg-navy-950/70 px-3 py-1 text-xs font-medium text-white">

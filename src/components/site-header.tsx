@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { FacebookIcon, InstagramIcon, WhatsAppIcon, YouTubeIcon } from "./icons";
 import { Logo } from "./logo";
+import { ShortlistLink } from "./shortlist-button";
 import { nav, site, whatsappLink } from "@/lib/site";
 
 function isActive(pathname: string | null, href: string) {
@@ -56,7 +57,7 @@ function HeaderView({ pathname }: { pathname: string | null }) {
         </div>
       </div>
 
-      <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/75">
+      <header className="site-header sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/75">
         <div className="container-x flex h-16 items-center justify-between gap-4 md:h-20">
           <Logo className="h-12 w-auto md:h-16" />
 
@@ -76,7 +77,8 @@ function HeaderView({ pathname }: { pathname: string | null }) {
             </ul>
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
+            <ShortlistLink />
             <Link href="/contact#enquire" className="btn-primary hidden sm:inline-flex">
               Book a site visit
             </Link>
@@ -99,6 +101,8 @@ function HeaderView({ pathname }: { pathname: string | null }) {
             </button>
           </div>
         </div>
+        {/* Reading progress, driven by scroll position in CSS (see globals.css). */}
+        <div className="scroll-progress absolute inset-x-0 bottom-0 h-0.5 origin-left bg-gradient-to-r from-gold-400 to-brand-500" aria-hidden />
       </header>
 
       <div
