@@ -51,13 +51,15 @@ Your current site already runs on Vercel, so you'll point it at this repository.
 1. Go to <https://vercel.com> → open the project that serves realvaluepromoters.com.
 2. **Settings → Git**: connect the repository `coddifyindia/real-value-promoters`
    (if the old project is tied to another repo, it's simpler to create a **new project**
-   from this repo and move the domain in step 2.6).
+   from this repo and move the domain in step 2.7).
 3. **Settings → Environment Variables**: add every variable from [`.env.example`](.env.example)
    for **Production** and **Preview**. Leave the Resend ones for now if step 3 isn't done;
    forms still save leads without them.
 4. **Settings → Functions → Function Region**: choose **Mumbai (bom1)**.
-5. **Deployments → Redeploy** (or push a commit). Open the `.vercel.app` URL and check the site.
-6. **Settings → Domains**: add `www.realvaluepromoters.com` and `realvaluepromoters.com`
+5. **Analytics → Enable** (Web Analytics). Free, cookie-free page-view stats; the site already
+   includes the tracking code. Lead, call and WhatsApp-click events also appear there on the Pro plan.
+6. **Deployments → Redeploy** (or push a commit). Open the `.vercel.app` URL and check the site.
+7. **Settings → Domains**: add `www.realvaluepromoters.com` and `realvaluepromoters.com`
    to this project (remove them from the old project first if you created a new one).
 
 Old links such as `/properties/1` redirect to the new addresses automatically, so

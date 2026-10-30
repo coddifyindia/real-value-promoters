@@ -1,7 +1,8 @@
 "use client";
 
 import { CalendarCheck, CheckCircle2, Loader2, MessageSquareText } from "lucide-react";
-import { useActionState, useId, useState } from "react";
+import { track } from "@vercel/analytics";
+import { useActionState, useEffect, useId, useState } from "react";
 import { submitLead } from "@/app/actions/leads";
 import type { LeadKind } from "@/lib/types";
 import type { FormState } from "@/lib/validation";
@@ -14,20 +15,31 @@ type Props = {
   defaultKind?: LeadKind;
   title?: string;
   compact?: boolean;
+  /** Prefills the message box (e.g. with the visitor's shortlist). */
+  defaultMessage?: string;
 };
 
 const initial: FormState = { status: "idle" };
 
-export function LeadForm({ property, defaultKind, title, compact = false }: Props) {
+export function LeadForm({ property, defaultKind, title, compact = false, defaultMessage }: Props) {
   const [state, action, pending] = useActionState(submitLead, initial);
   const [kind, setKind] = useState<LeadKind>(defaultKind ?? (property ? "enquiry" : "contact"));
   const id = useId();
   const onSubmit = usePublicFormSubmit(action);
 
+  useEffect(() => {
+    if (state.status === "success") track("Lead", { kind, property: property?.name ?? "none" });
+    // Only when a submission succeeds, not when the visitor toggles the kind afterwards.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
+
   if (state.status === "success") {
     return (
-      <div className="rounded-2xl border border-green-200 bg-green-50 p-6 text-center" role="status">
-        <CheckCircle2 className="mx-auto size-10 text-green-600" aria-hidden />
+      <div className="enter rounded-2xl border border-green-200 bg-green-50 p-6 text-center" role="status">
+        <span className="relative mx-auto flex size-14 items-center justify-center">
+          <span className="absolute inset-0 animate-ping rounded-full bg-green-400/30 [animation-iteration-count:2]" aria-hidden />
+          <CheckCircle2 className="relative size-12 text-green-600" aria-hidden />
+        </span>
         <h3 className="mt-3 text-xl">Thank you! We&apos;ve got your request.</h3>
         <p className="mt-2 text-sm text-slate-600">
           Our team will call you within one working day. We&apos;ve also emailed you a confirmation.
@@ -147,11 +159,12 @@ export function LeadForm({ property, defaultKind, title, compact = false }: Prop
 
       <div>
         <label htmlFor={`${id}-message`} className="label">
-          Message <span className="font-normal text-slate-400">(optional)</span>
+          Message <span className="font-normal text-slate-500">(optional)</span>
         </label>
         <textarea
           {...field("message")}
           rows={compact ? 3 : 4}
+          defaultValue={defaultMessage}
           className="field resize-y"
           placeholder={property ? `I'm interested in ${property.name}…` : "Budget, preferred location, plot size…"}
         />

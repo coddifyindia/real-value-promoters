@@ -61,6 +61,28 @@ npx supabase start
 This applies `supabase/migrations` and `supabase/seed.sql` automatically; copy the printed
 URL and keys into `.env.local`.
 
+## Tests
+
+| Command | What it checks |
+| --- | --- |
+| `npm run lint` / `npm run typecheck` | Code style and TypeScript types |
+| `npm test` | Unit tests (Vitest): EMI maths, form validation, shortlist storage, CSV safety |
+| `npm run test:e2e` | Browser tests (Playwright) on phone, tablet and desktop sizes: every page loads without errors or sideways scrolling, passes automated accessibility checks (axe), filters, shortlist, EMI calculator, forms, redirects, SEO files, reduced-motion |
+
+The browser tests run against a production build:
+
+```bash
+npm run build
+```
+
+```bash
+npm run test:e2e
+```
+
+Tests that write to the database (form submission, newsletter, admin login guard) run only
+with a local Supabase and `E2E_SUPABASE=1`. GitHub Actions runs everything, including those,
+on every pull request (`.github/workflows/ci.yml`).
+
 ## Project layout
 
 ```
@@ -70,6 +92,8 @@ src/app/actions/       server actions (public forms, admin)
 src/components/        UI components
 src/lib/               data access, Supabase clients, email, validation
 src/data/              seed data for the 13 launch projects
+tests/unit/            Vitest unit tests
+e2e/                   Playwright browser tests
 supabase/              SQL migration and seed
 public/images/         optimized project photos
 ```

@@ -1,4 +1,5 @@
 import {
+  ArrowUpRight,
   BadgeCheck,
   Banknote,
   Car,
@@ -7,7 +8,9 @@ import {
   Landmark,
   MapPinned,
   Quote,
+  Search,
   ShieldCheck,
+  Sparkles,
   Trees,
 } from "lucide-react";
 import Image from "next/image";
@@ -34,6 +37,23 @@ const reasons = [
   { icon: BadgeCheck, title: "After-sales support", text: "We stay in touch after registration for construction, resale and documentation help." },
 ];
 
+const heroSlides = [
+  { src: "/images/properties/diamond-avenue/01.webp", alt: "Entrance arch of Diamond Avenue, a Real Value gated community in Coimbatore" },
+  { src: "/images/properties/golden-farms/01.webp", alt: "" },
+  { src: "/images/properties/crystal-gateway/01.webp", alt: "" },
+  { src: "/images/properties/thulir-garden/01.webp", alt: "" },
+];
+
+const loanPartners = ["SBI", "HDFC Bank", "LIC Housing Finance", "Tata Capital"];
+
+function heroStats(projects: number, cities: number) {
+  return [
+    [String(projects), "Live projects"],
+    [String(cities), "Cities in Tamil Nadu"],
+    ["85%", "Bank loan support"],
+  ] as const;
+}
+
 const steps = [
   { title: "Shortlist", text: "Tell us your budget and preferred area. We'll suggest the right projects." },
   { title: "Visit the site", text: "See the layout in person. We arrange pickup and walk you through it." },
@@ -45,32 +65,57 @@ export default async function HomePage() {
   const properties = await getPublishedProperties();
   const featured = properties.filter((p) => p.featured).slice(0, 6);
   const cities = getCities(properties);
-  const cityCounts = cities.map((c) => ({ city: c, count: properties.filter((p) => p.city === c).length }));
+  // Biggest market first: it gets the large tile.
+  const cityTiles = cities
+    .map((city) => {
+      const inCity = properties.filter((p) => p.city === city);
+      return { city, count: inCity.length, image: inCity.find((p) => p.images.length)?.images[0] };
+    })
+    .sort((a, b) => b.count - a.count);
 
   return (
     <>
       {/* Hero */}
       <section className="relative isolate overflow-hidden bg-navy-950">
-        <Image
-          src="/images/properties/diamond-avenue/01.webp"
-          alt="Entrance arch of Diamond Avenue, a Real Value gated community in Coimbatore"
-          fill
-          priority
-          sizes="100vw"
-          className="-z-10 object-cover opacity-60"
-        />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-navy-950 via-navy-950/40 to-navy-950/10" />
-        <div className="container-x flex min-h-[78svh] flex-col justify-end pt-24 pb-12 sm:pb-16 lg:min-h-[640px]">
-          <p className="eyebrow text-gold-300">Coimbatore · Trichy · Madurai · Erode · Pollachi</p>
-          <h1 className="mt-4 max-w-3xl text-4xl leading-[1.08] text-white sm:text-5xl lg:text-6xl">
-            Own land you can be proud of, in places that keep growing.
+        <div className="absolute inset-0 -z-10">
+          {heroSlides.map((slide, i) => (
+            <div key={slide.src} className="hero-slide absolute inset-0" style={{ "--i": i } as React.CSSProperties}>
+              <Image
+                src={slide.src}
+                alt={i === 0 ? slide.alt : ""}
+                fill
+                priority={i === 0}
+                sizes="100vw"
+                className="object-cover"
+              />
+            </div>
+          ))}
+        </div>
+        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-navy-950 via-navy-950/55 to-navy-950/20" />
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_left,rgb(220_171_82/0.18),transparent_55%)]" />
+
+        <div className="container-x flex min-h-[86svh] flex-col justify-end pt-28 pb-10 sm:pb-14 lg:min-h-[720px]">
+          <p className="enter inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 text-xs font-medium text-white/90 backdrop-blur-md" style={{ "--d": 0 } as React.CSSProperties}>
+            <Sparkles className="size-3.5 text-gold-300" aria-hidden />
+            DTCP &amp; RERA approved · {properties.length} live projects
+          </p>
+          <h1
+            className="enter mt-5 max-w-4xl text-4xl leading-[1.05] text-white sm:text-6xl lg:text-7xl"
+            style={{ "--d": 1 } as React.CSSProperties}
+          >
+            Own land you can be proud of, in places that{" "}
+            <span className="bg-gradient-to-r from-gold-300 via-gold-400 to-gold-300 bg-clip-text text-transparent italic">keep growing.</span>
           </h1>
-          <p className="mt-5 max-w-2xl text-base text-white/80 sm:text-lg">
-            DTCP &amp; RERA approved plots, villas and farm land with gated amenities, clear documents and bank loan
-            support.
+          <p className="enter mt-5 max-w-2xl text-base text-white/80 sm:text-lg" style={{ "--d": 2 } as React.CSSProperties}>
+            Gated plots, villas and farm land across Coimbatore, Trichy, Madurai, Erode and Pollachi, with clear
+            documents, bank loans and free site visits.
           </p>
 
-          <form action="/properties" className="mt-8 grid max-w-3xl gap-2 rounded-2xl bg-white p-2 shadow-lift sm:grid-cols-[1fr_1fr_auto]">
+          <form
+            action="/properties"
+            className="enter mt-8 grid max-w-3xl gap-2 rounded-2xl border border-white/20 bg-white/10 p-2 shadow-lift backdrop-blur-xl sm:grid-cols-[1fr_1fr_auto]"
+            style={{ "--d": 3 } as React.CSSProperties}
+          >
             <label>
               <span className="sr-only">City</span>
               <select name="city" className="field border-transparent">
@@ -89,10 +134,19 @@ export default async function HomePage() {
                 <option value="farm_land">Farm Land</option>
               </select>
             </label>
-            <button type="submit" className="btn-primary px-8">
-              Find properties
+            <button type="submit" className="btn-gold px-8">
+              <Search className="size-4" aria-hidden /> Find properties
             </button>
           </form>
+
+          <dl className="enter mt-10 grid max-w-3xl grid-cols-3 divide-x divide-white/15 border-t border-white/15 pt-6" style={{ "--d": 4 } as React.CSSProperties}>
+            {heroStats(properties.length, cities.length).map(([value, label]) => (
+              <div key={label} className="flex flex-col px-3 first:pl-0 sm:px-6">
+                <dt className="order-2 text-xs text-white/60 sm:text-sm">{label}</dt>
+                <dd className="font-display text-2xl text-white sm:text-4xl">{value}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </section>
 
@@ -100,7 +154,7 @@ export default async function HomePage() {
       <section className="border-b border-slate-200 bg-white">
         <div className="container-x grid grid-cols-2 gap-x-4 gap-y-6 py-8 lg:grid-cols-4">
           {trust.map(({ icon: Icon, title, text }) => (
-            <div key={title} className="flex items-start gap-3">
+            <div key={title} className="reveal flex items-start gap-3">
               <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-gold-100 text-gold-600">
                 <Icon className="size-5" aria-hidden />
               </span>
@@ -134,19 +188,36 @@ export default async function HomePage() {
       </section>
 
       {/* Locations */}
-      <section className="bg-white py-16 sm:py-20">
+      <section className="bg-white py-16 sm:py-24">
         <div className="container-x">
           <SectionHeading eyebrow="Where we build" title="Projects across Tamil Nadu" />
-          <ul className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-            {cityCounts.map(({ city, count }) => (
-              <li key={city}>
+          <ul className="mt-10 grid auto-rows-[180px] grid-cols-2 gap-3 sm:auto-rows-[220px] sm:gap-4 lg:grid-cols-4">
+            {cityTiles.map(({ city, count, image }, i) => (
+              <li key={city} className={`reveal ${i === 0 ? "col-span-2 row-span-2" : ""}`}>
                 <Link
                   href={`/properties?city=${encodeURIComponent(city)}`}
-                  className="flex h-full flex-col rounded-2xl border border-slate-200 p-5 transition hover:border-brand-500 hover:shadow-card"
+                  className="group relative flex h-full flex-col justify-end overflow-hidden rounded-2xl bg-navy-900 p-5 text-white"
                 >
-                  <span className="font-display text-xl text-navy-900">{city}</span>
-                  <span className="mt-1 text-sm text-slate-500">
-                    {count} {count === 1 ? "project" : "projects"}
+                  {image && (
+                    <Image
+                      src={image}
+                      alt=""
+                      fill
+                      sizes={i === 0 ? "(min-width: 1024px) 50vw, 100vw" : "(min-width: 1024px) 25vw, 50vw"}
+                      className="-z-0 object-cover opacity-80 transition duration-700 group-hover:scale-110 group-hover:opacity-90"
+                    />
+                  )}
+                  <span className="absolute inset-0 bg-gradient-to-t from-navy-950/90 via-navy-950/30 to-transparent" />
+                  <span className="relative flex items-end justify-between gap-2">
+                    <span>
+                      <span className={`block font-display text-white ${i === 0 ? "text-3xl sm:text-4xl" : "text-xl sm:text-2xl"}`}>{city}</span>
+                      <span className="mt-0.5 block text-sm text-white/75">
+                        {count} {count === 1 ? "project" : "projects"}
+                      </span>
+                    </span>
+                    <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur transition group-hover:bg-gold-400 group-hover:text-navy-950">
+                      <ArrowUpRight className="size-4" aria-hidden />
+                    </span>
                   </span>
                 </Link>
               </li>
@@ -164,8 +235,11 @@ export default async function HomePage() {
           />
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {reasons.map(({ icon: Icon, title, text }) => (
-              <div key={title} className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-slate-200/70">
-                <span className="inline-flex size-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+              <div
+                key={title}
+                className="reveal group rounded-2xl bg-white p-6 shadow-card ring-1 ring-slate-200/70 transition duration-300 hover:-translate-y-1 hover:shadow-lift"
+              >
+                <span className="inline-flex size-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600 transition-colors duration-300 group-hover:bg-brand-600 group-hover:text-white">
                   <Icon className="size-6" aria-hidden />
                 </span>
                 <h3 className="mt-4 text-lg">{title}</h3>
@@ -177,7 +251,9 @@ export default async function HomePage() {
       </section>
 
       {/* Process */}
-      <section className="bg-navy-900 py-16 text-white sm:py-24">
+      <section className="relative isolate overflow-hidden bg-navy-900 py-16 text-white sm:py-24">
+        <div className="absolute -top-40 -right-40 -z-10 size-[30rem] rounded-full bg-brand-500/20 blur-3xl" aria-hidden />
+        <div className="absolute -bottom-40 -left-40 -z-10 size-[30rem] rounded-full bg-gold-400/10 blur-3xl" aria-hidden />
         <div className="container-x">
           <div className="mx-auto max-w-2xl text-center">
             <p className="eyebrow text-gold-300">How it works</p>
@@ -185,7 +261,7 @@ export default async function HomePage() {
           </div>
           <ol className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {steps.map((s, i) => (
-              <li key={s.title} className="rounded-2xl border border-white/10 bg-white/5 p-6">
+              <li key={s.title} className="reveal relative rounded-2xl border border-white/10 bg-white/5 p-6 transition-colors hover:border-gold-400/40 hover:bg-white/10">
                 <span className="font-display text-4xl text-gold-400">{String(i + 1).padStart(2, "0")}</span>
                 <h3 className="mt-3 text-lg text-white">{s.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-white/70">{s.text}</p>
@@ -201,7 +277,7 @@ export default async function HomePage() {
           <SectionHeading eyebrow="Happy families" title="What our buyers say" />
           <div className="mt-12 grid gap-6 md:grid-cols-3">
             {testimonials.map((t) => (
-              <figure key={t.name} className="flex flex-col rounded-2xl bg-white p-6 shadow-card ring-1 ring-slate-200/70">
+              <figure key={t.name} className="reveal flex flex-col rounded-2xl bg-white p-6 shadow-card ring-1 ring-slate-200/70">
                 <Quote className="size-8 text-gold-400" aria-hidden />
                 <blockquote className="mt-3 flex-1 text-slate-700">&ldquo;{t.quote}&rdquo;</blockquote>
                 <figcaption className="mt-5 border-t border-slate-100 pt-4">
@@ -212,21 +288,30 @@ export default async function HomePage() {
             ))}
           </div>
 
-          <div className="mt-16 grid items-center gap-8 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 lg:grid-cols-[auto_1fr]">
+          <div className="reveal mt-16 grid items-center gap-8 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 lg:grid-cols-[auto_minmax(0,1fr)]">
             <div>
               <p className="eyebrow">Channel partner of</p>
               <p className="mt-1 font-display text-2xl text-navy-900">Greenfield Housing</p>
               <p className="text-sm text-slate-500">Land of Happiness</p>
             </div>
-            <div className="lg:border-l lg:border-slate-200 lg:pl-8">
+            <div className="min-w-0 lg:border-l lg:border-slate-200 lg:pl-8">
               <p className="eyebrow">Home loan partners</p>
-              <ul className="mt-3 flex flex-wrap gap-2">
-                {["SBI", "HDFC Bank", "LIC Housing Finance", "Tata Capital"].map((b) => (
-                  <li key={b} className="rounded-full bg-sand-100 px-4 py-2 text-sm font-semibold text-navy-800">
-                    {b}
-                  </li>
-                ))}
-              </ul>
+              <div className="marquee mt-3 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+                {/* Rendered twice so the loop is seamless; the copy is hidden from screen readers. */}
+                <div className="marquee-track flex w-max gap-2">
+                  {[0, 1].map((copy) =>
+                    loanPartners.map((b) => (
+                      <span
+                        key={`${copy}-${b}`}
+                        aria-hidden={copy === 1}
+                        className="inline-flex items-center gap-2 rounded-full bg-sand-100 px-4 py-2 text-sm font-semibold whitespace-nowrap text-navy-800"
+                      >
+                        <Landmark className="size-4 text-gold-600" aria-hidden /> {b}
+                      </span>
+                    )),
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
