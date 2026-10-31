@@ -15,7 +15,7 @@ export function LeadEditor({ id, status, notes }: { id: string; status: LeadStat
       <input type="hidden" name="id" value={id} />
       <label className="block">
         <span className="text-xs font-medium text-slate-600">Status</span>
-        <select name="status" defaultValue={status} className="field mt-1">
+        <select name="status" defaultValue={status} className="field select-field mt-1">
           {LEAD_STATUSES.map((s) => (
             <option key={s} value={s}>{LEAD_STATUS_LABELS[s]}</option>
           ))}

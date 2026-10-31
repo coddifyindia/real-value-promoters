@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 
 // Guards the sizing rules every control follows:
 // - 44px minimum height (and width on touch screens): Apple/Google touch-target guidance, WCAG 2.5.5
+// - text fields and dropdowns are at least 48px (the site's control size)
 // - controls side by side in a form share one height, so rows line up
 // - inputs keep 16px text on touch screens, or iOS zooms the page when they're focused
 const pages = ["/", "/properties", "/properties/diamond-avenue", "/shortlist", "/services", "/about", "/contact", "/admin/login"];
@@ -30,6 +31,8 @@ for (const path of pages) {
       for (const el of controls) {
         const r = el.getBoundingClientRect();
         if (r.height < 43.5) out.push(`height ${Math.round(r.height)}px: ${el.tagName} "${name(el)}"`);
+        if ((el.tagName === "INPUT" || el.tagName === "SELECT") && r.height < 47.5)
+          out.push(`field height ${Math.round(r.height)}px (min 48): ${el.tagName} "${name(el)}"`);
         if (isTouch && r.width < 43.5) out.push(`width ${Math.round(r.width)}px: ${el.tagName} "${name(el)}"`);
       }
 

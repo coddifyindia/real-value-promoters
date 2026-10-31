@@ -133,7 +133,7 @@ export function PropertyForm({ property }: { property?: Property }) {
           </div>
           <div>
             <label htmlFor={`${id}-type`} className="label">Type</label>
-            <select {...f("type")} defaultValue={property?.type ?? "plot"} className="field">
+            <select {...f("type")} defaultValue={property?.type ?? "plot"} className="field select-field">
               {PROPERTY_TYPES.map((t) => (
                 <option key={t} value={t}>{PROPERTY_TYPE_LABELS[t]}</option>
               ))}

@@ -98,13 +98,13 @@ async function Leads({ searchParams }: Pick<PageProps<"/admin">, "searchParams">
 
       <form className="grid gap-2 rounded-2xl bg-white p-3 ring-1 ring-slate-200 sm:grid-cols-[1fr_auto_auto_auto]">
         <input name="q" defaultValue={q} placeholder="Search name, phone, email, property" className="field" aria-label="Search" />
-        <select name="status" defaultValue={status} className="field" aria-label="Status">
+        <select name="status" defaultValue={status} className="field select-field" aria-label="Status">
           <option value="">All except spam</option>
           {LEAD_STATUSES.map((s) => (
             <option key={s} value={s}>{LEAD_STATUS_LABELS[s]}</option>
           ))}
         </select>
-        <select name="kind" defaultValue={kind} className="field" aria-label="Type">
+        <select name="kind" defaultValue={kind} className="field select-field" aria-label="Type">
           <option value="">All types</option>
           {LEAD_KINDS.map((k) => (
             <option key={k} value={k}>{LEAD_KIND_LABELS[k]}</option>

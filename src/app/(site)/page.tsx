@@ -5,7 +5,9 @@ import {
   Car,
   FileCheck2,
   Handshake,
+  House,
   Landmark,
+  MapPin,
   MapPinned,
   Quote,
   Search,
@@ -15,6 +17,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { WithIcon } from "@/components/field";
 import { LeadForm } from "@/components/lead-form";
 import { Magnetic, SplitText } from "@/components/motion";
 import { PropertyGrid } from "@/components/property-card";
@@ -118,29 +121,33 @@ export default async function HomePage() {
 
           <form
             action="/properties"
-            className="enter mt-8 grid max-w-3xl gap-2 rounded-2xl border border-white/20 bg-white/10 p-2 shadow-lift backdrop-blur-xl sm:grid-cols-[1fr_1fr_auto]"
+            className="enter mt-8 grid max-w-3xl gap-2 rounded-3xl border border-white/20 bg-white/10 p-2 shadow-lift backdrop-blur-xl sm:grid-cols-[1fr_1fr_auto]"
             style={{ "--d": 3 } as React.CSSProperties}
           >
             <label>
               <span className="sr-only">City</span>
-              <select name="city" className="field border-transparent">
-                <option value="">Any city</option>
-                {cities.map((c) => (
-                  <option key={c}>{c}</option>
-                ))}
-              </select>
+              <WithIcon icon={MapPin}>
+                <select name="city" className="field field-lg field-icon select-field border-transparent">
+                  <option value="">Any city</option>
+                  {cities.map((c) => (
+                    <option key={c}>{c}</option>
+                  ))}
+                </select>
+              </WithIcon>
             </label>
             <label>
               <span className="sr-only">Property type</span>
-              <select name="type" className="field border-transparent">
-                <option value="">Any type</option>
-                <option value="plot">Plot</option>
-                <option value="villa">Villa</option>
-                <option value="farm_land">Farm Land</option>
-              </select>
+              <WithIcon icon={House}>
+                <select name="type" className="field field-lg field-icon select-field border-transparent">
+                  <option value="">Any type</option>
+                  <option value="plot">Plot</option>
+                  <option value="villa">Villa</option>
+                  <option value="farm_land">Farm Land</option>
+                </select>
+              </WithIcon>
             </label>
-            <button type="submit" className="btn-gold px-8">
-              <Search className="size-4" aria-hidden /> Find properties
+            <button type="submit" className="btn-gold btn-lg">
+              <Search className="size-5" aria-hidden /> Find properties
             </button>
           </form>
 
