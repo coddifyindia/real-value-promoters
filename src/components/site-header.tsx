@@ -58,7 +58,7 @@ function HeaderView({ pathname }: { pathname: string | null }) {
         </div>
       </div>
 
-      <header className="site-header sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/75">
+      <header className="site-header sticky top-0 z-40 border-b border-slate-200/80 bg-white">
         <div className="container-x flex h-16 items-center justify-between gap-4 md:h-20">
           <Logo className="h-12 w-auto md:h-16" />
 

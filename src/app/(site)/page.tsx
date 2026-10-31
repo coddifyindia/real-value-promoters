@@ -312,9 +312,9 @@ export default async function HomePage() {
       </section>
 
       {/* Big type band */}
-      <section aria-label="What we offer" className="overflow-hidden bg-sand-50 py-10 sm:py-14">
+      <section aria-label="What we offer" className="overflow-hidden bg-sand-50 pt-10 pb-2 sm:pt-16 sm:pb-4">
         <div className="marquee [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
-          <div className="marquee-track flex w-max items-center gap-10 font-display text-6xl whitespace-nowrap text-navy-900 sm:text-8xl">
+          <div className="marquee-track flex w-max items-center gap-10 font-display text-6xl leading-none whitespace-nowrap text-navy-900 sm:text-8xl">
             {[0, 1].map((copy) =>
               bandWords.map((w, i) => (
                 <span key={`${copy}-${w}`} aria-hidden={copy === 1} className="flex items-center gap-10">
