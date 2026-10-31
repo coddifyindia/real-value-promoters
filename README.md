@@ -36,6 +36,24 @@ Without Supabase credentials the public site renders from
 `src/data/seed-properties.json`, so previews and first deploys never show an
 empty catalogue.
 
+## When things go wrong
+
+| Failure | What visitors see |
+| --- | --- |
+| Database slow or down | Pages keep serving the last good copy from cache. Requests time out after 8–10s instead of hanging, with one automatic retry. |
+| Database down when someone enquires | The enquiry is emailed to the team marked **[NOT SAVED]**, and the visitor still gets the thank-you screen. Only if email also fails do they see a message with Call/WhatsApp buttons. |
+| Visitor's connection drops while sending | The form keeps what they typed and offers WhatsApp. |
+| Any other server error | A designed error page (`error.tsx`) with Try again, Home, Call and WhatsApp. Raw error details are never shown; a reference code matches the server log. |
+| Unknown URL | A designed 404 page with ways forward, marked `noindex`. |
+
+## Security
+
+- Content Security Policy limited to the hosts the site uses (YouTube, Google Maps, Supabase), `frame-ancestors 'none'`, HSTS, `nosniff`, a strict referrer policy, `Cross-Origin-Opener-Policy`, no `X-Powered-By`.
+- `/admin` responses are `no-store` and `noindex`. Every admin page and action checks the `admins` table, and row-level security enforces the same rule in Postgres.
+- Admin-entered links are allowlisted: maps must be Google Maps embeds, reels must be instagram.com, and photos must be the bundled images or this project's storage bucket.
+- Enquiries and newsletter sign-ups are validated (zod), honeypot- and timing-checked, and rate-limited per salted IP hash.
+- `/.well-known/security.txt` gives researchers a contact.
+
 ## Local development
 
 ```bash
@@ -67,7 +85,7 @@ URL and keys into `.env.local`.
 | --- | --- |
 | `npm run lint` / `npm run typecheck` | Code style and TypeScript types |
 | `npm test` | Unit tests (Vitest): EMI maths, form validation, shortlist storage, CSV safety |
-| `npm run test:e2e` | Browser tests (Playwright) on phone, tablet and desktop sizes: every page loads without errors or sideways scrolling, passes automated accessibility checks (axe), filters, shortlist, EMI calculator, forms, redirects, SEO files, reduced-motion |
+| `npm run test:e2e` | Browser tests (Playwright) on phone, tablet and desktop sizes: every page loads without errors or sideways scrolling, passes automated accessibility checks (axe), 44px touch targets and aligned form rows, filters, shortlist, EMI calculator, forms (including a dropped connection), rate limits, redirects, SEO files, security headers, reduced-motion |
 
 The browser tests run against a production build:
 

@@ -15,6 +15,7 @@ test("filters by city and keeps them in the URL", async ({ page }) => {
 
 test("search narrows results and can be cleared", async ({ page }) => {
   await page.goto("/properties");
+  await expect(page.locator("main article:visible").first()).toBeVisible();
   const total = await page.locator("main article:visible").count();
   await page.getByRole("searchbox", { name: "Search properties" }).fill("diamond");
   await expect(page.locator("main article:visible")).toHaveCount(1);

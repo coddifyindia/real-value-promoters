@@ -6,7 +6,7 @@ import { useActionState, useEffect, useId, useState } from "react";
 import { submitLead } from "@/app/actions/leads";
 import type { LeadKind } from "@/lib/types";
 import type { FormState } from "@/lib/validation";
-import { Honeypot, usePublicFormSubmit } from "./form-meta";
+import { Honeypot, usePublicFormSubmit, withNetworkFallback } from "./form-meta";
 import { WhatsAppIcon } from "./icons";
 
 type Props = {
@@ -20,9 +20,10 @@ type Props = {
 };
 
 const initial: FormState = { status: "idle" };
+const submit = withNetworkFallback(submitLead);
 
 export function LeadForm({ property, defaultKind, title, compact = false, defaultMessage }: Props) {
-  const [state, action, pending] = useActionState(submitLead, initial);
+  const [state, action, pending] = useActionState(submit, initial);
   const [kind, setKind] = useState<LeadKind>(defaultKind ?? (property ? "enquiry" : "contact"));
   const id = useId();
   const onSubmit = usePublicFormSubmit(action);
@@ -88,7 +89,7 @@ export function LeadForm({ property, defaultKind, title, compact = false, defaul
               role="radio"
               aria-checked={kind === value}
               onClick={() => setKind(value)}
-              className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full text-sm font-semibold text-slate-600 transition-colors aria-checked:bg-white aria-checked:text-navy-900 aria-checked:shadow-sm"
+              className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full text-sm font-semibold text-slate-600 transition-colors aria-checked:bg-white aria-checked:text-navy-900 aria-checked:shadow-sm"
             >
               <Icon className="size-4" aria-hidden /> {label}
             </button>

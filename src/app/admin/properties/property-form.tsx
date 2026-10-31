@@ -183,7 +183,7 @@ export function PropertyForm({ property }: { property?: Property }) {
         {images.length === 0 ? (
           <p className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500">No photos yet.</p>
         ) : (
-          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          <ul className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 sm:grid-cols-3 xl:grid-cols-4">
             {images.map((src, i) => (
               <li key={src} className="overflow-hidden rounded-xl ring-1 ring-slate-200">
                 <div className="relative aspect-[4/3] bg-slate-100">
@@ -192,17 +192,17 @@ export function PropertyForm({ property }: { property?: Property }) {
                     <span className="absolute top-2 left-2 rounded-full bg-gold-400 px-2 py-0.5 text-xs font-semibold text-navy-950">Cover</span>
                   )}
                 </div>
-                <div className="flex items-center justify-between bg-white p-1">
-                  <button type="button" onClick={() => move(i, -1)} disabled={i === 0} className="inline-flex size-9 items-center justify-center rounded-lg hover:bg-slate-100 disabled:opacity-30" aria-label="Move earlier">
+                <div className="grid grid-cols-4 gap-1 bg-white p-1">
+                  <button type="button" onClick={() => move(i, -1)} disabled={i === 0} className="inline-flex h-11 items-center justify-center rounded-lg hover:bg-slate-100 disabled:opacity-30" aria-label="Move earlier" title="Move earlier">
                     <ArrowLeft className="size-4" />
                   </button>
-                  <button type="button" onClick={() => setImages((p) => [src, ...p.filter((x) => x !== src)])} disabled={i === 0} className="inline-flex size-9 items-center justify-center rounded-lg hover:bg-slate-100 disabled:opacity-30" aria-label="Make cover">
+                  <button type="button" onClick={() => setImages((p) => [src, ...p.filter((x) => x !== src)])} disabled={i === 0} className="inline-flex h-11 items-center justify-center rounded-lg hover:bg-slate-100 disabled:opacity-30" aria-label="Make cover" title="Make cover">
                     <Star className="size-4" />
                   </button>
-                  <button type="button" onClick={() => setImages((p) => p.filter((x) => x !== src))} className="inline-flex size-9 items-center justify-center rounded-lg text-red-600 hover:bg-red-50" aria-label="Remove photo">
+                  <button type="button" onClick={() => setImages((p) => p.filter((x) => x !== src))} className="inline-flex h-11 items-center justify-center rounded-lg text-red-600 hover:bg-red-50" aria-label="Remove photo" title="Remove photo">
                     <Trash2 className="size-4" />
                   </button>
-                  <button type="button" onClick={() => move(i, 1)} disabled={i === images.length - 1} className="inline-flex size-9 items-center justify-center rounded-lg hover:bg-slate-100 disabled:opacity-30" aria-label="Move later">
+                  <button type="button" onClick={() => move(i, 1)} disabled={i === images.length - 1} className="inline-flex h-11 items-center justify-center rounded-lg hover:bg-slate-100 disabled:opacity-30" aria-label="Move later" title="Move later">
                     <ArrowRight className="size-4" />
                   </button>
                 </div>

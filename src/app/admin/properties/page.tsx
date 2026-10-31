@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
+import { TableSkeleton } from "@/components/skeletons";
 import { requireAdmin } from "@/lib/auth";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { PROPERTY_TYPE_LABELS, type Property } from "@/lib/types";
@@ -13,7 +14,7 @@ export const metadata: Metadata = { title: "Properties" };
 export default function AdminPropertiesPage() {
   if (!isSupabaseConfigured) return <SetupNotice />;
   return (
-    <Suspense fallback={<p className="text-slate-500">Loading…</p>}>
+    <Suspense fallback={<TableSkeleton label="Loading properties" />}>
       <PropertyList />
     </Suspense>
   );

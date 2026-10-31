@@ -44,6 +44,15 @@ not in chat or email:
 
    Repeat steps 6–7 for each team member who should see leads.
 
+### Updating an existing database
+
+When a new file appears in `supabase/migrations/`, run it once in **SQL Editor → New query**
+(paste the file, **Run**). The site keeps working if you forget, but the feature it adds stays off:
+
+| File | Adds |
+| --- | --- |
+| `20261031000000_subscriber_rate_limit.sql` | Per-connection limit on newsletter sign-ups |
+
 ## 2. Vercel: hosting
 
 Your current site already runs on Vercel, so you'll point it at this repository.

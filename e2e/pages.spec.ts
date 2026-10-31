@@ -1,13 +1,17 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
+// The browser cancels a page-transition animation if the viewport resizes mid-way
+// (e.g. a phone's address bar collapsing). Nothing breaks; the page just doesn't animate.
+const BENIGN = ["Transition was aborted because of invalid state"];
+
 const pages = ["/", "/properties", "/properties/diamond-avenue", "/shortlist", "/services", "/about", "/contact"];
 
 for (const path of pages) {
   test(`${path} renders cleanly`, async ({ page }) => {
     const errors: string[] = [];
-    page.on("pageerror", (e) => errors.push(e.message));
-    page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
+    page.on("pageerror", (e) => !BENIGN.some((b) => e.message.includes(b)) && errors.push(e.message));
+    page.on("console", (m) => m.type() === "error" && !BENIGN.some((b) => m.text().includes(b)) && errors.push(m.text()));
 
     const res = await page.goto(path);
     expect(res?.status()).toBe(200);

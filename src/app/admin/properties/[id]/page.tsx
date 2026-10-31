@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { FormSkeleton } from "@/components/skeletons";
 import { deleteProperty } from "@/app/actions/admin";
 import { requireAdmin } from "@/lib/auth";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -17,7 +18,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export default function EditPropertyPage({ params }: PageProps<"/admin/properties/[id]">) {
   if (!isSupabaseConfigured) return <SetupNotice />;
   return (
-    <Suspense fallback={<p className="text-slate-500">Loading…</p>}>
+    <Suspense fallback={<FormSkeleton label="Loading property" />}>
       <Editor params={params} />
     </Suspense>
   );

@@ -52,7 +52,7 @@ export default async function AboutPage() {
             <Link href="/contact" className="btn-outline">Contact us</Link>
           </div>
         </div>
-        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-lift">
+        <div data-reveal="clip" className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-lift">
           <Image
             src="/images/properties/opal-garden/01.webp"
             alt="Entrance of Opal Garden by Greenfield Housing, Coimbatore"

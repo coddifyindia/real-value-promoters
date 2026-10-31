@@ -1,0 +1,5 @@
+# Report security issues with this website privately, please.
+Contact: mailto:realvaluelandpromoters@gmail.com
+Expires: 2027-10-31T00:00:00.000Z
+Preferred-Languages: en, ta
+Canonical: https://www.realvaluepromoters.com/.well-known/security.txt

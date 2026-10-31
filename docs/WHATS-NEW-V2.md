@@ -24,5 +24,15 @@ A summary of the premium upgrade, written for the Real Value Promoters team.
 | What | Details |
 | --- | --- |
 | **Visitor analytics** | Vercel Web Analytics: page views, top projects, traffic sources and devices. Cookie-free, so no consent banner is needed. Leads, calls and WhatsApp taps are tracked as conversions (on Vercel Pro). |
-| **Automated testing** | 25 unit tests and 99 browser tests, run on phone, tablet and desktop sizes on every change. They cover: every page loads without errors or sideways scrolling, accessibility checks, filters, shortlist, EMI maths, enquiry and newsletter forms saved to the database, old-link redirects and SEO files. |
+| **Automated testing** | 31 unit tests and 138 browser tests (46 checks, each on phone, tablet and desktop sizes), run on every change. They cover: every page loads without errors or sideways scrolling, accessibility checks, touch-target sizes, filters, shortlist, EMI maths, enquiry and newsletter forms saved to the database, a dropped connection, rate limits, security headers, old-link redirects and SEO files. |
 | **Accessibility fixes** | The tests found low-contrast text (gold labels, the WhatsApp button, form hints). Colours were adjusted to meet WCAG AA, which is also a Google ranking signal. |
+
+## Round 2: award-level polish and reliability
+
+| Area | What changed |
+| --- | --- |
+| **Animation** | Headlines rise word by word. The hero photos drift with a parallax effect while the copy fades as you scroll (desktop). Live numbers count up. "How it works" cards stack over each other as you scroll. A giant-type band scrolls across the page. Photos are uncovered with a wipe. Main buttons have a light sheen and lean toward the mouse. All of it is CSS-first and switches off for reduced-motion users. |
+| **Sizing audit** | Every button, field and link was measured on phone, tablet and desktop. All are now at least 44px (the touch-target standard). Fields and buttons in a row share one height. Fields keep 16px text on touch screens so iPhones don't zoom in. An automated test enforces this from now on. |
+| **Errors** | Designed error and 404 pages, always with a way to reach the team. If the database goes down, pages stay up from cache and enquiries are emailed to the team instead of being lost. A dropped connection keeps the visitor's typing. |
+| **Loading** | Shimmer placeholders shaped like the real content (no jumping layout). The menu link and the tapped project card show progress immediately. |
+| **Security** | Strict browser security policy (CSP, HSTS and more), locked-down admin, allowlisted admin links, newsletter rate limiting, and a published security contact. |

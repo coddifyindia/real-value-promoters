@@ -2,6 +2,7 @@ import { CalendarDays, Download, Mail, Phone } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
+import { TableSkeleton } from "@/components/skeletons";
 import { WhatsAppIcon } from "@/components/icons";
 import { requireAdmin } from "@/lib/auth";
 import { telLink } from "@/lib/site";
@@ -25,7 +26,7 @@ const PAGE_SIZE = 50;
 export default function LeadsPage({ searchParams }: PageProps<"/admin">) {
   if (!isSupabaseConfigured) return <SetupNotice />;
   return (
-    <Suspense fallback={<p className="text-slate-500">Loading leads…</p>}>
+    <Suspense fallback={<TableSkeleton label="Loading leads" />}>
       <Leads searchParams={searchParams} />
     </Suspense>
   );

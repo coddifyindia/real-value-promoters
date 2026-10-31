@@ -1,6 +1,7 @@
 import { Download } from "lucide-react";
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { TableSkeleton } from "@/components/skeletons";
 import { requireAdmin } from "@/lib/auth";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { SetupNotice } from "../setup-notice";
@@ -10,7 +11,7 @@ export const metadata: Metadata = { title: "Subscribers" };
 export default function SubscribersPage() {
   if (!isSupabaseConfigured) return <SetupNotice />;
   return (
-    <Suspense fallback={<p className="text-slate-500">Loading…</p>}>
+    <Suspense fallback={<TableSkeleton label="Loading subscribers" />}>
       <Subscribers />
     </Suspense>
   );

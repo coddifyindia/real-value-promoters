@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, startTransition, type FormEvent } from "react";
+import { site, whatsappLink } from "@/lib/site";
+import type { FormState } from "@/lib/validation";
 
 const UTM_KEY = "rvp_utm";
 
@@ -55,6 +57,29 @@ export function usePublicFormSubmit(action: (formData: FormData) => void) {
     } catch {}
   }, []);
   return useActionSubmit(action, extend);
+}
+
+/**
+ * Wraps a server action so a dropped connection (offline, flaky mobile data,
+ * a deploy mid-request) becomes a friendly message in the form instead of
+ * throwing to the page's error boundary. Define the result at module level so
+ * its identity is stable for useActionState.
+ */
+export function withNetworkFallback(action: (prev: FormState, formData: FormData) => Promise<FormState>) {
+  return async (prev: FormState, formData: FormData): Promise<FormState> => {
+    try {
+      return await action(prev, formData);
+    } catch {
+      const offline = typeof navigator !== "undefined" && !navigator.onLine;
+      return {
+        status: "error",
+        message: offline
+          ? "You seem to be offline. Check your connection and try again; what you typed is still here."
+          : `We couldn't reach our server. Please try again, or call ${site.phone.display}.`,
+        whatsappUrl: whatsappLink("Hi, I tried to send an enquiry on your website but it didn't go through."),
+      };
+    }
+  };
 }
 
 // Honeypot: hidden from people, irresistible to bots.

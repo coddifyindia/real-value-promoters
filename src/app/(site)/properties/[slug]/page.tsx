@@ -10,6 +10,7 @@ import { JsonLd } from "@/components/json-ld";
 import { LeadForm } from "@/components/lead-form";
 import { PropertyGrid } from "@/components/property-card";
 import { ShortlistButton } from "@/components/shortlist-button";
+import { PropertySkeleton } from "@/components/skeletons";
 import { YouTubeEmbed } from "@/components/youtube-embed";
 import { getPropertyBySlug, getPublishedProperties } from "@/lib/properties";
 import { site, telLink, whatsappLink } from "@/lib/site";
@@ -250,17 +251,4 @@ function listingJsonLd(p: Property) {
       },
     ],
   };
-}
-
-function PropertySkeleton() {
-  return (
-    <div className="container-x animate-pulse pt-8 pb-16" aria-busy="true" aria-label="Loading property">
-      <div className="h-4 w-48 rounded bg-slate-200" />
-      <div className="mt-6 h-10 w-2/3 rounded bg-slate-200" />
-      <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_380px]">
-        <div className="aspect-[16/10] rounded-2xl bg-slate-200" />
-        <div className="h-96 rounded-2xl bg-slate-200" />
-      </div>
-    </div>
-  );
 }

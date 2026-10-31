@@ -16,6 +16,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { LeadForm } from "@/components/lead-form";
+import { Magnetic, SplitText } from "@/components/motion";
 import { PropertyGrid } from "@/components/property-card";
 import { SectionHeading } from "@/components/section-heading";
 import { getCities, getPublishedProperties } from "@/lib/properties";
@@ -44,14 +45,16 @@ const heroSlides = [
   { src: "/images/properties/thulir-garden/01.webp", alt: "" },
 ];
 
+const bandWords = ["Gated plots", "Villas", "Farm land", "DTCP approved", "Bank loans", "Free site visits"];
+
 const loanPartners = ["SBI", "HDFC Bank", "LIC Housing Finance", "Tata Capital"];
 
 function heroStats(projects: number, cities: number) {
   return [
-    [String(projects), "Live projects"],
-    [String(cities), "Cities in Tamil Nadu"],
-    ["85%", "Bank loan support"],
-  ] as const;
+    { value: projects, suffix: "", label: "Live projects" },
+    { value: cities, suffix: "", label: "Cities in Tamil Nadu" },
+    { value: 85, suffix: "%", label: "Bank loan support" },
+  ];
 }
 
 const steps = [
@@ -77,7 +80,7 @@ export default async function HomePage() {
     <>
       {/* Hero */}
       <section className="relative isolate overflow-hidden bg-navy-950">
-        <div className="absolute inset-0 -z-10">
+        <div className="hero-parallax absolute inset-0 -z-10">
           {heroSlides.map((slide, i) => (
             <div key={slide.src} className="hero-slide absolute inset-0" style={{ "--i": i } as React.CSSProperties}>
               <Image
@@ -94,17 +97,19 @@ export default async function HomePage() {
         <div className="absolute inset-0 -z-10 bg-gradient-to-t from-navy-950 via-navy-950/55 to-navy-950/20" />
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_left,rgb(220_171_82/0.18),transparent_55%)]" />
 
-        <div className="container-x flex min-h-[86svh] flex-col justify-end pt-28 pb-10 sm:pb-14 lg:min-h-[720px]">
+        <div className="hero-fade container-x flex min-h-[86svh] flex-col justify-end pt-28 pb-10 sm:pb-14 lg:min-h-[720px]">
           <p className="enter inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 text-xs font-medium text-white/90 backdrop-blur-md" style={{ "--d": 0 } as React.CSSProperties}>
             <Sparkles className="size-3.5 text-gold-300" aria-hidden />
             DTCP &amp; RERA approved · {properties.length} live projects
           </p>
-          <h1
-            className="enter mt-5 max-w-4xl text-4xl leading-[1.05] text-white sm:text-6xl lg:text-7xl"
-            style={{ "--d": 1 } as React.CSSProperties}
-          >
-            Own land you can be proud of, in places that{" "}
-            <span className="bg-gradient-to-r from-gold-300 via-gold-400 to-gold-300 bg-clip-text text-transparent italic">keep growing.</span>
+          <h1 className="mt-5 max-w-4xl text-4xl leading-[1.05] text-white sm:text-6xl lg:text-7xl">
+            <SplitText on="load" delay={2} text="Own land you can be proud of, in places that" />{" "}
+            <SplitText
+              on="load"
+              delay={11}
+              text="keep growing."
+              wordClassName="bg-gradient-to-r from-gold-300 via-gold-400 to-gold-300 bg-clip-text pr-1 text-transparent italic"
+            />
           </h1>
           <p className="enter mt-5 max-w-2xl text-base text-white/80 sm:text-lg" style={{ "--d": 2 } as React.CSSProperties}>
             Gated plots, villas and farm land across Coimbatore, Trichy, Madurai, Erode and Pollachi, with clear
@@ -140,10 +145,18 @@ export default async function HomePage() {
           </form>
 
           <dl className="enter mt-10 grid max-w-3xl grid-cols-3 divide-x divide-white/15 border-t border-white/15 pt-6" style={{ "--d": 4 } as React.CSSProperties}>
-            {heroStats(properties.length, cities.length).map(([value, label]) => (
+            {heroStats(properties.length, cities.length).map(({ value, suffix, label }) => (
               <div key={label} className="flex flex-col px-3 first:pl-0 sm:px-6">
                 <dt className="order-2 text-xs text-white/60 sm:text-sm">{label}</dt>
-                <dd className="font-display text-2xl text-white sm:text-4xl">{value}</dd>
+                <dd className="font-display text-2xl text-white tabular-nums sm:text-4xl">
+                  <span className="sr-only">
+                    {value}
+                    {suffix}
+                  </span>
+                  {/* Counts up from 0 in CSS; the real number above is what screen readers hear. */}
+                  <span aria-hidden className="count-up" style={{ "--to": value } as React.CSSProperties} />
+                  <span aria-hidden>{suffix}</span>
+                </dd>
               </div>
             ))}
           </dl>
@@ -251,23 +264,59 @@ export default async function HomePage() {
       </section>
 
       {/* Process */}
-      <section className="relative isolate overflow-hidden bg-navy-900 py-16 text-white sm:py-24">
+      <section className="relative isolate overflow-clip bg-navy-900 py-16 text-white sm:py-24">
         <div className="absolute -top-40 -right-40 -z-10 size-[30rem] rounded-full bg-brand-500/20 blur-3xl" aria-hidden />
         <div className="absolute -bottom-40 -left-40 -z-10 size-[30rem] rounded-full bg-gold-400/10 blur-3xl" aria-hidden />
-        <div className="container-x">
-          <div className="mx-auto max-w-2xl text-center">
+        <div className="container-x grid gap-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] lg:gap-20">
+          {/* On large screens the heading stays put while the step cards stack over each other. */}
+          <div className="lg:sticky lg:top-32 lg:self-start">
             <p className="eyebrow text-gold-300">How it works</p>
-            <h2 className="mt-2 text-3xl text-white sm:text-4xl">From first call to registration</h2>
+            <h2 className="mt-2 text-3xl text-white sm:text-5xl">
+              <SplitText text="From first call to registration" />
+            </h2>
+            <p className="mt-5 max-w-md text-white/70">
+              One team from shortlist to sale deed. No middlemen, no surprises, and help after you buy.
+            </p>
+            <Magnetic>
+              <Link href="/contact#enquire" className="btn-gold mt-8 px-7">
+                Start with a free site visit <ArrowUpRight className="size-4" aria-hidden />
+              </Link>
+            </Magnetic>
           </div>
-          <ol className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <ol className="space-y-6">
             {steps.map((s, i) => (
-              <li key={s.title} className="reveal relative rounded-2xl border border-white/10 bg-white/5 p-6 transition-colors hover:border-gold-400/40 hover:bg-white/10">
-                <span className="font-display text-4xl text-gold-400">{String(i + 1).padStart(2, "0")}</span>
-                <h3 className="mt-3 text-lg text-white">{s.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-white/70">{s.text}</p>
+              <li
+                key={s.title}
+                className="rounded-3xl border border-white/10 bg-navy-800/95 p-7 shadow-2xl shadow-navy-950/40 backdrop-blur sm:p-9 lg:sticky"
+                style={{ top: `calc(8rem + ${i * 1.75}rem)` }}
+              >
+                <div className="flex items-start justify-between gap-6">
+                  <span className="font-display text-5xl text-gold-400 sm:text-6xl">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="mt-2 text-xs tracking-[0.2em] text-white/60 uppercase">
+                    Step {i + 1} of {steps.length}
+                  </span>
+                </div>
+                <h3 className="mt-6 text-2xl text-white">{s.title}</h3>
+                <p className="mt-2 leading-relaxed text-white/70">{s.text}</p>
               </li>
             ))}
           </ol>
+        </div>
+      </section>
+
+      {/* Big type band */}
+      <section aria-label="What we offer" className="overflow-hidden bg-sand-50 py-10 sm:py-14">
+        <div className="marquee [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+          <div className="marquee-track flex w-max items-center gap-10 font-display text-6xl whitespace-nowrap text-navy-900 sm:text-8xl">
+            {[0, 1].map((copy) =>
+              bandWords.map((w, i) => (
+                <span key={`${copy}-${w}`} aria-hidden={copy === 1} className="flex items-center gap-10">
+                  <span className={i % 2 ? "outline-type" : ""}>{w}</span>
+                  <Sparkles className="size-8 shrink-0 text-gold-400 sm:size-12" aria-hidden />
+                </span>
+              )),
+            )}
+          </div>
         </div>
       </section>
 
@@ -327,7 +376,7 @@ export default async function HomePage() {
               title="Book a free site visit"
               description="Share a few details and our team will call you within one working day with options that fit your budget. Pickup is on us."
             />
-            <div className="relative mt-8 hidden aspect-[4/3] overflow-hidden rounded-2xl lg:block">
+            <div data-reveal="clip" className="relative mt-8 hidden aspect-[4/3] overflow-hidden rounded-2xl lg:block">
               <Image
                 src="/images/properties/golden-farms/01.webp"
                 alt="Aerial view of Real Value Golden Farms near Pollachi"

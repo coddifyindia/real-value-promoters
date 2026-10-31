@@ -71,7 +71,7 @@ export function Gallery({ images, name, slug }: { images: string[]; name: string
           <button
             type="button"
             onClick={() => setLightbox(true)}
-            className="inline-flex size-9 items-center justify-center rounded-full bg-navy-950/70 text-white hover:bg-navy-950"
+            className="inline-flex size-11 items-center justify-center rounded-full bg-navy-950/70 text-white hover:bg-navy-950"
             aria-label="View full screen"
           >
             <Expand className="size-4" />

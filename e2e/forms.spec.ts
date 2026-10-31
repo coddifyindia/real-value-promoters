@@ -46,13 +46,37 @@ test.describe("with database", () => {
     await context.close();
   });
 
-  test("newsletter sign-up", async ({ page }, info) => {
+  test("newsletter sign-up", async ({ browser }, info) => {
+    // Own client IP per run: sign-ups are rate-limited per connection.
+    const ip = `10.${200 + info.workerIndex}.${Date.now() % 250}.${Math.floor(Math.random() * 250)}`;
+    const context = await browser.newContext({ extraHTTPHeaders: { "x-forwarded-for": ip } });
+    const page = await context.newPage();
     await page.goto("/");
     await page.waitForTimeout(2800);
     const footer = page.locator("footer");
     await footer.getByRole("textbox", { name: /email/i }).fill(`e2e-news+${info.project.name}-${Date.now()}@example.com`);
     await footer.getByRole("button", { name: "Subscribe" }).click();
     await expect(footer.getByText("You're subscribed")).toBeVisible();
+    await context.close();
+  });
+
+  test("newsletter sign-ups are rate-limited per connection", async ({ browser }, info) => {
+    test.setTimeout(90_000); // six real sign-ups, each waiting out the bot timer
+    const ip = `10.99.${info.workerIndex}.${Math.floor(Math.random() * 250)}`;
+    const context = await browser.newContext({ extraHTTPHeaders: { "x-forwarded-for": ip } });
+    const page = await context.newPage();
+    let last = "";
+    for (let i = 0; i < 6; i++) {
+      await page.goto("/about");
+      await page.waitForTimeout(2700);
+      const footer = page.locator("footer");
+      await footer.getByRole("textbox", { name: /email/i }).fill(`limit-${info.project.name}-${Date.now()}-${i}@example.com`);
+      await footer.getByRole("button", { name: "Subscribe" }).click();
+      await expect(footer.getByRole("alert").or(footer.getByRole("status"))).toBeVisible();
+      last = (await footer.getByRole("alert").or(footer.getByRole("status")).textContent()) ?? "";
+    }
+    expect(last).toContain("Too many sign-ups");
+    await context.close();
   });
 
   test("admin area is login-protected", async ({ page }) => {

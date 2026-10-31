@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { FacebookIcon, InstagramIcon, WhatsAppIcon, YouTubeIcon } from "./icons";
+import { LinkPending } from "./link-pending";
 import { Logo } from "./logo";
 import { ShortlistLink } from "./shortlist-button";
 import { nav, site, whatsappLink } from "@/lib/site";
@@ -42,7 +43,7 @@ function HeaderView({ pathname }: { pathname: string | null }) {
   return (
     <>
       <div className="hidden bg-navy-900 text-sm text-white/80 md:block">
-        <div className="container-x flex h-10 items-center justify-between">
+        <div className="container-x flex h-11 items-center justify-between">
           <div className="flex items-center gap-6">
             <a href={`tel:${site.phone.tel}`} className="inline-flex items-center gap-2 hover:text-white">
               <Phone className="size-4" aria-hidden /> {site.phone.display}
@@ -68,9 +69,10 @@ function HeaderView({ pathname }: { pathname: string | null }) {
                   <Link
                     href={item.href}
                     aria-current={isActive(pathname, item.href) ? "page" : undefined}
-                    className="rounded-full px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-navy-900 aria-[current=page]:bg-brand-50 aria-[current=page]:text-brand-700"
+                    className="relative inline-flex min-h-11 items-center rounded-full px-4 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-navy-900 aria-[current=page]:bg-brand-50 aria-[current=page]:text-brand-700"
                   >
                     {item.label}
+                    <LinkPending />
                   </Link>
                 </li>
               ))}
@@ -180,7 +182,7 @@ export function SocialLinks({ className = "hover:text-white" }: { className?: st
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className={`inline-flex size-9 items-center justify-center rounded-full transition-colors ${className}`}
+      className={`inline-flex size-11 items-center justify-center rounded-full transition-colors ${className}`}
     >
       <Icon className="size-[18px]" />
     </a>

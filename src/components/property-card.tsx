@@ -2,6 +2,7 @@ import { ArrowUpRight, MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { ViewTransition } from "react";
+import { LinkPending } from "./link-pending";
 import { ShortlistButton } from "./shortlist-button";
 import { PROPERTY_TYPE_LABELS, type Property } from "@/lib/types";
 
@@ -42,6 +43,7 @@ export function PropertyCard({ property, priority = false }: { property: Propert
         <h3 className="text-xl leading-snug">
           <Link href={`/properties/${property.slug}`} className="after:absolute after:inset-0">
             {property.name}
+            <LinkPending variant="card" />
           </Link>
         </h3>
         <p className="mt-1.5 flex items-start gap-1.5 text-sm text-slate-500">
