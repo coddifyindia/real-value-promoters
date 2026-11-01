@@ -19,6 +19,7 @@
 // migration is recorded as applied before pushing (a one-off "baseline").
 import { execFileSync } from "node:child_process";
 import postgres from "postgres";
+import { normalizeDbUrl } from "./db-url.mjs";
 
 const log = (msg) => console.log(`[migrate] ${msg}`);
 
@@ -27,14 +28,26 @@ if (process.env.VERCEL_ENV !== "production") {
   process.exit(0);
 }
 
-const url = process.env.SUPABASE_DB_URL;
-if (!url) {
+const rawUrl = process.env.SUPABASE_DB_URL;
+if (!rawUrl) {
   console.warn(
     "[migrate] SUPABASE_DB_URL is not set, so database migrations were NOT applied. " +
       "Add it in Vercel → Settings → Environment Variables (Production). See SETUP.md.",
   );
   process.exit(0);
 }
+
+// Percent-encode the password (exactly once), so a password containing
+// @ : / ? # % works whether or not it was encoded by hand. See db-url.mjs.
+let url;
+try {
+  url = normalizeDbUrl(rawUrl);
+} catch (error) {
+  console.error(`[migrate] ${error instanceof Error ? error.message : "SUPABASE_DB_URL is not valid."}`);
+  process.exit(1);
+}
+// Never echo the connection string, in either form, in an error message.
+const redact = (text) => String(text).split(rawUrl).join("<SUPABASE_DB_URL>").split(url).join("<SUPABASE_DB_URL>");
 
 // The first migration: creates the tables. Applied by hand on the live project.
 const BASELINE = "20261029000000";
@@ -60,7 +73,7 @@ try {
   }
 } catch (error) {
   console.error("[migrate] Could not connect to the database. Check SUPABASE_DB_URL (use the Session pooler string).");
-  throw new Error(error instanceof Error ? error.message.replace(url, "<SUPABASE_DB_URL>") : "connection failed");
+  throw new Error(error instanceof Error ? redact(error.message) : "connection failed");
 } finally {
   await sql.end({ timeout: 1 }).catch(() => {});
 }

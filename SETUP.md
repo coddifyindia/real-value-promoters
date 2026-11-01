@@ -54,7 +54,11 @@ live database. If a migration fails, that deploy stops and the current site keep
 To turn it on (once):
 
 1. In Supabase, click **Connect** (top of the project) and choose **Session pooler**.
-   Copy the connection string and put your database password in place of `[YOUR-PASSWORD]`.
+   Copy the connection string and put your database password in place of `[YOUR-PASSWORD]`,
+   **exactly as it is**: no brackets, and no need to encode symbols such as `@ : / # ? %`.
+   The build encodes the password correctly itself (`scripts/db-url.mjs`), and still works if
+   it was already encoded. If `[YOUR-PASSWORD]` is left in, the deploy stops with a message
+   saying so.
    Use the *Session pooler* string, not *Direct connection*: the direct one needs IPv6,
    which Vercel's build machines don't have.
 2. In Vercel, go to **Settings → Environment Variables** and add `SUPABASE_DB_URL` with that
