@@ -1,4 +1,4 @@
-import { ExternalLink } from "lucide-react";
+import { ArrowLeft, Building2, ExternalLink, PencilLine, TriangleAlert } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -32,7 +32,7 @@ async function Editor({ params }: Pick<PageProps<"/admin/properties/[id]">, "par
   if (id === "new") {
     return (
       <div className="space-y-8">
-        <PageHeader title="Add property" description="Fill in the details below. You can save it hidden and publish later." />
+        <PageHeader title="Add property" icon={Building2} description="Fill in the details below. You can save it hidden and publish later." />
         <PropertyForm />
       </div>
     );
@@ -46,8 +46,8 @@ async function Editor({ params }: Pick<PageProps<"/admin/properties/[id]">, "par
   return (
     <div className="space-y-8">
       <div>
-        <Link href="/admin/properties" className="inline-flex h-10 items-center text-sm text-slate-500 hover:text-navy-900">← All properties</Link>
-        <PageHeader title={property.name} description="Changes go live on the website as soon as you save.">
+        <Link href="/admin/properties" className="inline-flex h-10 items-center gap-1.5 text-sm text-slate-500 hover:text-navy-900"><ArrowLeft className="size-4" aria-hidden /> All properties</Link>
+        <PageHeader title={property.name} icon={PencilLine} description="Changes go live on the website as soon as you save.">
           {property.published && (
             <Link href={`/properties/${property.slug}`} target="_blank" rel="noopener" className="btn-outline">
               <ExternalLink className="size-4" aria-hidden /> Preview on site
@@ -58,9 +58,12 @@ async function Editor({ params }: Pick<PageProps<"/admin/properties/[id]">, "par
       <PropertyForm property={property} />
       <form action={deleteProperty} className="rounded-2xl border border-red-200 bg-red-50 p-6 sm:p-8">
         <input type="hidden" name="id" value={property.id} />
-        <p className="text-sm text-red-800">
+        <p className="flex gap-2 text-sm text-red-800">
+          <TriangleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
+          <span>
           Deleting removes this property from the website permanently. Leads that mention it are kept. To hide it
           temporarily, untick <strong>Published</strong> instead.
+          </span>
         </p>
         <DeletePropertyButton />
       </form>

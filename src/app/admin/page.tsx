@@ -1,4 +1,20 @@
-import { CalendarDays, Download, Mail, Phone } from "lucide-react";
+import {
+  CalendarCheck,
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Download,
+  Inbox,
+  Link2,
+  type LucideIcon,
+  Mail,
+  MessageSquareText,
+  Phone,
+  Search,
+  SearchX,
+  SlidersHorizontal,
+} from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -87,6 +103,7 @@ async function Leads({ searchParams }: Pick<PageProps<"/admin">, "searchParams">
     <div className="space-y-8">
       <PageHeader
         title="Leads"
+        icon={Inbox}
         description="Everyone who sent an enquiry, booked a site visit or asked for a callback on the website. Newest first."
         meta={
           <>
@@ -103,7 +120,10 @@ async function Leads({ searchParams }: Pick<PageProps<"/admin">, "searchParams">
       <form className="grid gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200 sm:grid-cols-2 sm:p-5 lg:grid-cols-[minmax(0,1fr)_220px_220px_auto]">
         <label className="sm:col-span-2 lg:col-span-1">
           <span className="label">Search</span>
-          <input name="q" defaultValue={q} placeholder="Name, phone, email or property" className="field" />
+          <span className="relative block">
+            <Search className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-slate-400" aria-hidden />
+            <input name="q" defaultValue={q} placeholder="Name, phone, email or property" className="field field-icon" />
+          </span>
         </label>
         <label>
           <span className="label">Status</span>
@@ -123,11 +143,16 @@ async function Leads({ searchParams }: Pick<PageProps<"/admin">, "searchParams">
             ))}
           </select>
         </label>
-        <button type="submit" className="btn-primary self-end sm:col-span-2 lg:col-span-1">Apply filters</button>
+        <button type="submit" className="btn-primary self-end sm:col-span-2 lg:col-span-1">
+          <SlidersHorizontal className="size-4" aria-hidden /> Apply filters
+        </button>
       </form>
 
       {leads.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
+        <div className="flex flex-col items-center rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
+          <span className="mb-4 inline-flex size-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-500">
+            {q || status || kind ? <SearchX className="size-6" aria-hidden /> : <Inbox className="size-6" aria-hidden />}
+          </span>
           <p className="font-display text-xl text-navy-900">{q || status || kind ? "No leads match these filters" : "No leads yet"}</p>
           <p className="mt-2 text-slate-500">
             {q || status || kind ? "Try clearing the search or choosing another status." : "They'll appear here as soon as someone submits a form on the website."}
@@ -143,16 +168,23 @@ async function Leads({ searchParams }: Pick<PageProps<"/admin">, "searchParams">
 
       {totalPages > 1 && (
         <nav className="flex items-center justify-between text-sm" aria-label="Pagination">
-          {page > 1 ? <Link href={`/admin${qs({ page: page - 1 })}`} className="btn-outline">Previous</Link> : <span />}
+          {page > 1 ? <Link href={`/admin${qs({ page: page - 1 })}`} className="btn-outline"><ChevronLeft className="size-4" aria-hidden /> Previous</Link> : <span />}
           <span className="text-slate-500">Page {page} of {totalPages}</span>
-          {page < totalPages ? <Link href={`/admin${qs({ page: page + 1 })}`} className="btn-outline">Next</Link> : <span />}
+          {page < totalPages ? <Link href={`/admin${qs({ page: page + 1 })}`} className="btn-outline">Next <ChevronRight className="size-4" aria-hidden /></Link> : <span />}
         </nav>
       )}
     </div>
   );
 }
 
+const KIND_ICON: Record<LeadKind, LucideIcon> = {
+  contact: Mail,
+  enquiry: MessageSquareText,
+  site_visit: CalendarCheck,
+};
+
 function LeadCard({ lead }: { lead: Lead }) {
+  const KindIcon = KIND_ICON[lead.kind];
   const digits = lead.phone.replace(/\D/g, "");
   const wa = `https://wa.me/${digits.length === 10 ? `91${digits}` : digits}`;
   const created = new Date(lead.created_at).toLocaleString("en-IN", {
@@ -166,13 +198,17 @@ function LeadCard({ lead }: { lead: Lead }) {
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-8">
         <div className="min-w-0 space-y-3">
           <div className="flex flex-wrap items-center gap-2">
-            <span className={`inline-flex h-7 items-center rounded-full px-3 text-xs font-semibold ${STATUS_STYLE[lead.status]}`}>
+            <span className={`inline-flex h-7 items-center gap-1.5 rounded-full px-3 text-xs font-semibold ${STATUS_STYLE[lead.status]}`}>
+              <span className="size-1.5 rounded-full bg-current" aria-hidden />
               {LEAD_STATUS_LABELS[lead.status]}
             </span>
-            <span className="inline-flex h-7 items-center rounded-full bg-slate-100 px-3 text-xs font-medium text-slate-700">
+            <span className="inline-flex h-7 items-center gap-1.5 rounded-full bg-slate-100 px-3 text-xs font-medium text-slate-700">
+              <KindIcon className="size-3.5" aria-hidden />
               {LEAD_KIND_LABELS[lead.kind]}
             </span>
-            <time dateTime={lead.created_at} className="text-xs text-slate-500">{created}</time>
+            <time dateTime={lead.created_at} className="inline-flex items-center gap-1.5 text-xs text-slate-500">
+              <Clock className="size-3.5" aria-hidden /> {created}
+            </time>
           </div>
           <p className="font-display text-2xl leading-tight text-navy-900">{lead.name}</p>
           {lead.property_name && <p className="text-sm text-brand-700">{lead.property_name}</p>}
@@ -194,7 +230,8 @@ function LeadCard({ lead }: { lead: Lead }) {
             </a>
           </div>
           {(lead.source_path || lead.utm) && (
-            <p className="text-xs text-slate-400">
+            <p className="inline-flex items-center gap-1.5 text-xs text-slate-400">
+              <Link2 className="size-3.5 shrink-0" aria-hidden />
               From {lead.source_path ?? "unknown page"}
               {lead.utm && ` · ${Object.values(lead.utm).join(" / ")}`}
             </p>

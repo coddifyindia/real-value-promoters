@@ -1,4 +1,4 @@
-import { Download } from "lucide-react";
+import { BellRing, CalendarDays, Download, FileText, Mail, MailX } from "lucide-react";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { TableSkeleton } from "@/components/skeletons";
@@ -32,6 +32,7 @@ async function Subscribers() {
     <div className="space-y-8">
       <PageHeader
         title="New-launch alerts"
+        icon={BellRing}
         description={
           <>
             People who typed their email into the <strong className="text-navy-900">“New-launch alerts”</strong> box at the
@@ -50,9 +51,9 @@ async function Subscribers() {
         <table className="w-full text-left text-sm">
           <thead className="border-b border-slate-200 bg-slate-50 text-slate-500">
             <tr>
-              <th className="px-6 py-4 font-medium">Email</th>
-              <th className="px-6 py-4 font-medium">Signed up</th>
-              <th className="hidden px-6 py-4 font-medium sm:table-cell">Signed up on page</th>
+              <th className="px-6 py-4 font-medium"><span className="inline-flex items-center gap-1.5"><Mail className="size-4" aria-hidden /> Email</span></th>
+              <th className="px-6 py-4 font-medium"><span className="inline-flex items-center gap-1.5"><CalendarDays className="size-4" aria-hidden /> Signed up</span></th>
+              <th className="hidden px-6 py-4 font-medium sm:table-cell"><span className="inline-flex items-center gap-1.5"><FileText className="size-4" aria-hidden /> Signed up on page</span></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -67,7 +68,7 @@ async function Subscribers() {
             ))}
             {!data?.length && (
               <tr>
-                <td colSpan={3} className="px-6 py-14 text-center text-slate-500">No sign-ups yet. They appear here when someone uses the “New-launch alerts” box in the website footer.</td>
+                <td colSpan={3} className="px-6 py-14 text-center text-slate-500"><MailX className="mx-auto mb-3 size-8 text-slate-400" aria-hidden />No sign-ups yet. They appear here when someone uses the “New-launch alerts” box in the website footer.</td>
               </tr>
             )}
           </tbody>

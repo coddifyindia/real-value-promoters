@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionSubmit } from "@/components/form-meta";
-import { Loader2, LockKeyhole, Mail } from "lucide-react";
+import { CircleAlert, Loader2, LockKeyhole, LogIn, Mail } from "lucide-react";
 import { WithIcon } from "@/components/field";
 import { useActionState } from "react";
 import { signIn } from "@/app/actions/admin";
@@ -25,10 +25,10 @@ export function LoginForm() {
         </WithIcon>
       </div>
       {state.status === "error" && (
-        <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700" role="alert">{state.message}</p>
+        <p className="flex gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-700" role="alert"><CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />{state.message}</p>
       )}
       <button type="submit" disabled={pending} className="btn-primary btn-lg w-full">
-        {pending && <Loader2 className="size-4 animate-spin" aria-hidden />} Sign in
+        {pending ? <Loader2 className="size-5 animate-spin" aria-hidden /> : <LogIn className="size-5" aria-hidden />} Sign in
       </button>
     </form>
   );

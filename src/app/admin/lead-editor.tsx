@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionSubmit } from "@/components/form-meta";
-import { Loader2 } from "lucide-react";
+import { Loader2, Save, StickyNote, Tag } from "lucide-react";
 import { useActionState } from "react";
 import { updateLead } from "@/app/actions/admin";
 import { LEAD_STATUS_LABELS, LEAD_STATUSES, type LeadStatus } from "@/lib/types";
@@ -14,7 +14,7 @@ export function LeadEditor({ id, status, notes }: { id: string; status: LeadStat
     <form onSubmit={onSubmit} className="space-y-4 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200/70 sm:p-5">
       <input type="hidden" name="id" value={id} />
       <label className="block">
-        <span className="label">Status</span>
+        <span className="label inline-flex items-center gap-1.5"><Tag className="size-4 text-slate-400" aria-hidden /> Status</span>
         <select name="status" defaultValue={status} className="field select-field">
           {LEAD_STATUSES.map((s) => (
             <option key={s} value={s}>{LEAD_STATUS_LABELS[s]}</option>
@@ -22,12 +22,12 @@ export function LeadEditor({ id, status, notes }: { id: string; status: LeadStat
         </select>
       </label>
       <label className="block">
-        <span className="label">Internal notes</span>
+        <span className="label inline-flex items-center gap-1.5"><StickyNote className="size-4 text-slate-400" aria-hidden /> Internal notes</span>
         <textarea name="notes" defaultValue={notes} rows={3} className="field" placeholder="e.g. Called on Monday, interested in a 3-cent plot at Diamond Avenue, visiting Saturday" />
       </label>
       <div className="flex items-center gap-3">
         <button type="submit" disabled={pending} className="btn-primary px-6">
-          {pending && <Loader2 className="size-4 animate-spin" aria-hidden />} Save changes
+          {pending ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <Save className="size-4" aria-hidden />} Save changes
         </button>
         {state.message && (
           <span className={`text-sm ${state.status === "error" ? "text-red-600" : "text-green-700"}`} role="status">

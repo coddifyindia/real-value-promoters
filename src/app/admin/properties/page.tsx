@@ -1,4 +1,4 @@
-import { ExternalLink, Pencil, Plus, Star } from "lucide-react";
+import { Building2, Eye, EyeOff, ExternalLink, ImageOff, MapPin, Pencil, Plus, Star } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -38,6 +38,7 @@ async function PropertyList() {
     <div className="space-y-8">
       <PageHeader
         title="Properties"
+        icon={Building2}
         description="The projects shown on the website. Click one to edit its details, prices and photos, or hide it without deleting."
         meta={
           <>
@@ -54,13 +55,15 @@ async function PropertyList() {
         {properties.map((p) => (
           <li key={p.id} className="group flex flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200 transition hover:shadow-card hover:ring-brand-500">
             <Link href={`/admin/properties/${p.id}`} className="flex flex-1 flex-col">
-              <div className="relative aspect-[16/9] bg-slate-100">
+              <div className="relative flex aspect-[16/9] items-center justify-center bg-slate-100 text-slate-400">
+                {!p.images[0] && <ImageOff className="size-8" aria-label="No photo yet" />}
                 {p.images[0] && <Image src={p.images[0]} alt="" fill sizes="(min-width: 1280px) 400px, (min-width: 640px) 50vw, 100vw" className="object-cover" />}
                 <span
-                  className={`absolute top-3 left-3 inline-flex h-7 items-center rounded-full px-3 text-xs font-semibold ${
+                  className={`absolute top-3 left-3 inline-flex h-7 items-center gap-1.5 rounded-full px-3 text-xs font-semibold ${
                     p.published ? "bg-green-600 text-white" : "bg-slate-700 text-white"
                   }`}
                 >
+                  {p.published ? <Eye className="size-3.5" aria-hidden /> : <EyeOff className="size-3.5" aria-hidden />}
                   {p.published ? "Live" : "Hidden"}
                 </span>
                 {p.featured && (
@@ -71,7 +74,8 @@ async function PropertyList() {
               </div>
               <div className="flex flex-1 flex-col p-5 pb-4">
                 <p className="font-display text-xl leading-snug text-navy-900">{p.name}</p>
-                <p className="mt-1 text-sm text-slate-500">
+                <p className="mt-1.5 inline-flex items-center gap-1.5 text-sm text-slate-500">
+                  <MapPin className="size-4 shrink-0" aria-hidden />
                   {PROPERTY_TYPE_LABELS[p.type]} · {p.city}
                 </p>
                 <p className="mt-auto pt-4 font-semibold text-brand-700">{p.price_label}</p>
@@ -87,8 +91,8 @@ async function PropertyList() {
                   <ExternalLink className="size-4" aria-hidden /> Preview
                 </a>
               ) : (
-                <span className="inline-flex min-h-11 items-center justify-center rounded-full px-4 text-center text-xs text-slate-500" title="Hidden projects aren't on the website. Tick Published to show it.">
-                  Not on the site
+                <span className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full px-4 text-center text-xs text-slate-500" title="Hidden projects aren't on the website. Tick Published to show it.">
+                  <EyeOff className="size-4" aria-hidden /> Not on the site
                 </span>
               )}
             </div>

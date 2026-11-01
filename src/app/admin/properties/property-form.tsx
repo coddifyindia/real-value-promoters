@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionSubmit } from "@/components/form-meta";
-import { ArrowLeft, ArrowRight, ExternalLink, ImagePlus, Loader2, Star, Trash2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, CircleAlert, Contact, Eye, ExternalLink, ImagePlus, Images, Info, Link2, Loader2, type LucideIcon, Plus, Save, Star, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useActionState, useId, useRef, useState } from "react";
 import { saveProperty } from "@/app/actions/admin";
@@ -88,7 +88,7 @@ export function PropertyForm({ property }: { property?: Property }) {
       <input type="hidden" name="images" value={JSON.stringify(images)} />
 
       <section className="grid gap-x-6 gap-y-6 rounded-2xl bg-white p-6 ring-1 ring-slate-200 sm:grid-cols-2 sm:p-8">
-        <SectionTitle title="Basics" text="What buyers see first on the project card and page." />
+        <SectionTitle icon={Info} title="Basics" text="What buyers see first on the project card and page." />
         <div>
           <label htmlFor={`${id}-name`} className="label">Name</label>
           <input
@@ -107,7 +107,7 @@ export function PropertyForm({ property }: { property?: Property }) {
         <div>
           <label htmlFor={`${id}-slug`} className="label">Web address</label>
           <div className="flex min-h-12 items-center rounded-xl border border-slate-300 bg-slate-50 focus-within:border-brand-500 focus-within:ring-4 focus-within:ring-brand-500/15">
-            <span className="pl-4 text-sm text-slate-500">/properties/</span>
+            <span className="inline-flex items-center gap-1.5 pl-4 text-sm text-slate-500"><Link2 className="size-4" aria-hidden />/properties/</span>
             <input
               {...f("slug")}
               value={slug}
@@ -170,17 +170,22 @@ export function PropertyForm({ property }: { property?: Property }) {
 
       <section className="space-y-6 rounded-2xl bg-white p-6 ring-1 ring-slate-200 sm:p-8">
         <div className="flex flex-wrap items-end justify-between gap-4">
-          <SectionTitle title="Photos" text="The first photo is the cover. Use the arrows to reorder." />
+          <SectionTitle icon={Images} title="Photos" text="The first photo is the cover. Use the arrows to reorder." />
           <button type="button" onClick={() => fileInput.current?.click()} disabled={uploading > 0} className="btn-outline">
             {uploading > 0 ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <ImagePlus className="size-4" aria-hidden />}
             {uploading > 0 ? `Uploading ${uploading}…` : "Add photos"}
           </button>
           <input ref={fileInput} type="file" accept="image/*" multiple hidden onChange={(e) => upload(e.target.files)} />
         </div>
-        {uploadError && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700" role="alert">{uploadError}</p>}
+        {uploadError && (
+          <p className="flex gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-700" role="alert">
+            <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
+            {uploadError}
+          </p>
+        )}
         {errorFor("images")}
         {images.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-slate-300 px-6 py-12 text-center text-slate-500">No photos yet. Click <strong>Add photos</strong> to upload from your computer or phone.</p>
+          <p className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-slate-300 px-6 py-12 text-center text-slate-500"><ImagePlus className="size-8 text-slate-400" aria-hidden /><span>No photos yet. Click <strong>Add photos</strong> to upload from your computer or phone.</span></p>
         ) : (
           <ul className="grid grid-cols-1 gap-4 min-[420px]:grid-cols-2 sm:grid-cols-3 xl:grid-cols-4">
             {images.map((src, i) => (
@@ -188,7 +193,7 @@ export function PropertyForm({ property }: { property?: Property }) {
                 <div className="relative aspect-[4/3] bg-slate-100">
                   <Image src={src} alt={`Photo ${i + 1}`} fill sizes="200px" className="object-cover" />
                   {i === 0 && (
-                    <span className="absolute top-2 left-2 rounded-full bg-gold-400 px-2 py-0.5 text-xs font-semibold text-navy-950">Cover</span>
+                    <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-gold-400 px-2 py-0.5 text-xs font-semibold text-navy-950"><Star className="size-3 fill-current" aria-hidden /> Cover</span>
                   )}
                 </div>
                 <div className="grid grid-cols-4 gap-1 bg-white p-1">
@@ -212,7 +217,7 @@ export function PropertyForm({ property }: { property?: Property }) {
       </section>
 
       <section className="grid gap-x-6 gap-y-6 rounded-2xl bg-white p-6 ring-1 ring-slate-200 sm:grid-cols-2 sm:p-8">
-        <SectionTitle title="Contact & media" text="Who buyers can call about this project, plus optional video and map links." />
+        <SectionTitle icon={Contact} title="Contact & media" text="Who buyers can call about this project, plus optional video and map links." />
         <div>
           <label htmlFor={`${id}-contact_name`} className="label">Project manager</label>
           <input {...f("contact_name")} defaultValue={property?.contact_name ?? ""} className="field" placeholder="e.g. Mr. Ramesh" />
@@ -244,7 +249,7 @@ export function PropertyForm({ property }: { property?: Property }) {
       </section>
 
       <section className="grid gap-6 rounded-2xl bg-white p-6 ring-1 ring-slate-200 sm:grid-cols-3 sm:p-8">
-        <SectionTitle title="Visibility" text="Control where this project appears." className="sm:col-span-3" />
+        <SectionTitle icon={Eye} title="Visibility" text="Control where this project appears." className="sm:col-span-3" />
         <label className="flex min-h-12 cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4 hover:border-slate-300">
           <input type="checkbox" name="published" defaultChecked={property?.published ?? true} className="mt-0.5 size-5 accent-brand-600" />
           <span>
@@ -279,7 +284,13 @@ export function PropertyForm({ property }: { property?: Property }) {
           </a>
         )}
         <button type="submit" disabled={pending || uploading > 0} className="btn-primary btn-lg min-w-48">
-          {pending && <Loader2 className="size-4 animate-spin" aria-hidden />}
+          {pending ? (
+            <Loader2 className="size-5 animate-spin" aria-hidden />
+          ) : property ? (
+            <Save className="size-5" aria-hidden />
+          ) : (
+            <Plus className="size-5" aria-hidden />
+          )}
           {property ? "Save changes" : "Create property"}
         </button>
       </div>
@@ -287,11 +298,26 @@ export function PropertyForm({ property }: { property?: Property }) {
   );
 }
 
-function SectionTitle({ title, text, className = "sm:col-span-2" }: { title: string; text: string; className?: string }) {
+function SectionTitle({
+  icon: Icon,
+  title,
+  text,
+  className = "sm:col-span-2",
+}: {
+  icon: LucideIcon;
+  title: string;
+  text: string;
+  className?: string;
+}) {
   return (
-    <div className={className}>
-      <h2 className="text-xl">{title}</h2>
-      <p className="mt-1 text-sm text-slate-500">{text}</p>
+    <div className={`flex items-start gap-4 ${className}`}>
+      <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-gold-100 text-gold-700">
+        <Icon className="size-5" aria-hidden />
+      </span>
+      <div>
+        <h2 className="text-xl">{title}</h2>
+        <p className="mt-0.5 text-sm text-slate-500">{text}</p>
+      </div>
     </div>
   );
 }
@@ -303,9 +329,9 @@ export function DeletePropertyButton() {
       onClick={(e) => {
         if (!confirm("Delete this property permanently? This cannot be undone.")) e.preventDefault();
       }}
-      className="btn mt-3 border border-red-300 bg-white text-red-700 hover:bg-red-100"
+      className="btn mt-4 border border-red-300 bg-white text-red-700 hover:bg-red-100"
     >
-      Delete property
+      <Trash2 className="size-4" aria-hidden /> Delete property
     </button>
   );
 }

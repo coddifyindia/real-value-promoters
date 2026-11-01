@@ -1,13 +1,17 @@
+import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
 /** One header layout for every admin page: title, a plain-English line on what the page is for, and actions. */
 export function PageHeader({
   title,
+  icon: Icon,
   description,
   meta,
   children,
 }: {
   title: string;
+  /** The same icon the page has in the admin nav. */
+  icon?: LucideIcon;
   description?: ReactNode;
   meta?: ReactNode;
   children?: ReactNode;
@@ -15,7 +19,14 @@ export function PageHeader({
   return (
     <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4 border-b border-slate-200 pb-6">
       <div className="max-w-2xl">
-        <h1 className="text-3xl sm:text-4xl">{title}</h1>
+        <h1 className="flex items-center gap-3 text-3xl sm:text-4xl">
+          {Icon && (
+            <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-2xl bg-brand-50 text-brand-700 sm:size-12">
+              <Icon className="size-5 sm:size-6" aria-hidden />
+            </span>
+          )}
+          {title}
+        </h1>
         {description && <p className="mt-2 leading-relaxed text-slate-600">{description}</p>}
         {meta && <div className="mt-3 flex flex-wrap gap-2 text-sm">{meta}</div>}
       </div>
