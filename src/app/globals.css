@@ -327,15 +327,21 @@
 /* ---------- Award-style motion ---------- */
 
 /* Word-by-word headline reveal: each word rises from behind a mask. */
+/* Both boxes reach 0.25em below the baseline and a little either side (padding,
+   cancelled by negative margins so layout doesn't move). Without that, the
+   mask clipped the tails of g, p and y, and gradient-filled words (which only
+   paint inside their own box) lost their descenders and italic overhang. */
 .split-word {
   display: inline-block;
   overflow: clip;
-  overflow-clip-margin: 0.12em;
   vertical-align: bottom;
-  padding-bottom: 0.06em;
+  padding: 0 0.1em 0.25em;
+  margin: 0 -0.1em -0.25em;
 }
 .split-word > span {
   display: inline-block;
+  padding: 0 0.1em 0.25em;
+  margin: 0 -0.1em -0.25em;
 }
 
 /* Image wipe: the photo is uncovered from the bottom while settling from a slight zoom. */
@@ -478,42 +484,28 @@
   }
 }
 
-/* ---------- Pinned horizontal gallery ----------
-   Without scroll-driven animation support, on small screens, or with reduced
-   motion it is a swipeable row that snaps to each project. */
-.gallery-viewport {
+/* ---------- Carousel (components/carousel.tsx) ----------
+   A plain horizontal scroller that snaps to each card. The left padding lines
+   the first card up with the page content, and scroll-padding keeps snapped
+   cards on that same line. */
+.carousel-viewport {
   overflow-x: auto;
+  overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory;
+  scroll-padding-inline: 1rem;
   scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
 }
-.gallery-viewport::-webkit-scrollbar {
+.carousel-viewport::-webkit-scrollbar {
   display: none;
 }
-@keyframes gallery-x {
-  to {
-    transform: translateX(calc(-100% + 100vw));
+@media (min-width: 640px) {
+  .carousel-viewport {
+    scroll-padding-inline: 1.5rem;
   }
 }
-@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: view()) {
-    .gallery {
-      height: 360vh;
-      view-timeline-name: --gallery;
-    }
-    .gallery-stage {
-      position: sticky;
-      top: 0;
-      height: 100svh;
-    }
-    .gallery-viewport {
-      overflow: visible;
-    }
-    .gallery-track {
-      animation: gallery-x linear both;
-      animation-timeline: --gallery;
-      animation-range: contain 0% contain 100%;
-    }
+@media (min-width: 1024px) {
+  .carousel-viewport {
+    scroll-padding-inline: max(2rem, calc((100vw - 80rem) / 2 + 2rem));
   }
 }
 
@@ -677,50 +669,6 @@
   :root:not(.no-intro) body:has(.intro-curtain) .enter {
     animation-delay: calc(var(--d, 0) * 120ms + 1.5s);
   }
-}
-
-/* ---------- Cursor label (mouse/trackpad only) ----------
-   The system cursor stays as it is. Over a project or city, a small pill
-   naming the action sits just below-right of the pointer, never on top of
-   the thing being pointed at. */
-.cursor-tag {
-  display: none;
-}
-.has-cursor .cursor-tag {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 90;
-  display: block;
-  pointer-events: none;
-}
-.has-cursor .cursor-tag > span {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin: 22px 0 0 18px;
-  padding: 0.5rem 0.85rem 0.5rem 1rem;
-  border-radius: 999px;
-  background: var(--color-navy-900);
-  color: white;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  white-space: nowrap;
-  box-shadow: 0 8px 24px -8px rgb(7 20 39 / 0.45);
-  opacity: 0;
-  transform: translateY(6px) scale(0.92);
-  transform-origin: top left;
-  transition:
-    opacity 0.2s,
-    transform 0.3s cubic-bezier(0.2, 0.75, 0.15, 1);
-}
-.has-cursor .cursor-tag > span::after {
-  content: "→";
-  color: var(--color-gold-300);
-}
-.cursor-tag[data-on] > span {
-  opacity: 1;
-  transform: none;
 }
 
 /* Film grain: a faint noise layer that takes the digital flatness off large colour fields. */

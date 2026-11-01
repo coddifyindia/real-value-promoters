@@ -1,4 +1,4 @@
-import { Plus, Star } from "lucide-react";
+import { ExternalLink, Pencil, Plus, Star } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -52,11 +52,8 @@ async function PropertyList() {
       </PageHeader>
       <ul className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {properties.map((p) => (
-          <li key={p.id}>
-            <Link
-              href={`/admin/properties/${p.id}`}
-              className="group flex h-full flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200 transition hover:shadow-card hover:ring-brand-500"
-            >
+          <li key={p.id} className="group flex flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200 transition hover:shadow-card hover:ring-brand-500">
+            <Link href={`/admin/properties/${p.id}`} className="flex flex-1 flex-col">
               <div className="relative aspect-[16/9] bg-slate-100">
                 {p.images[0] && <Image src={p.images[0]} alt="" fill sizes="(min-width: 1280px) 400px, (min-width: 640px) 50vw, 100vw" className="object-cover" />}
                 <span
@@ -72,17 +69,29 @@ async function PropertyList() {
                   </span>
                 )}
               </div>
-              <div className="flex flex-1 flex-col p-5">
+              <div className="flex flex-1 flex-col p-5 pb-4">
                 <p className="font-display text-xl leading-snug text-navy-900">{p.name}</p>
                 <p className="mt-1 text-sm text-slate-500">
                   {PROPERTY_TYPE_LABELS[p.type]} · {p.city}
                 </p>
-                <div className="mt-auto flex items-center justify-between gap-3 pt-5">
-                  <p className="font-semibold text-brand-700">{p.price_label}</p>
-                  <span className="text-sm font-medium text-slate-500 group-hover:text-navy-900">Edit →</span>
-                </div>
+                <p className="mt-auto pt-4 font-semibold text-brand-700">{p.price_label}</p>
               </div>
             </Link>
+            {/* Two clear actions per card: edit here, or open the live page in a new tab. */}
+            <div className="grid grid-cols-2 gap-3 border-t border-slate-100 p-4">
+              <Link href={`/admin/properties/${p.id}`} className="btn-outline min-h-11 px-4 text-sm">
+                <Pencil className="size-4" aria-hidden /> Edit
+              </Link>
+              {p.published ? (
+                <a href={`/properties/${p.slug}`} target="_blank" rel="noopener" className="btn-outline min-h-11 px-4 text-sm">
+                  <ExternalLink className="size-4" aria-hidden /> Preview
+                </a>
+              ) : (
+                <span className="inline-flex min-h-11 items-center justify-center rounded-full px-4 text-center text-xs text-slate-500" title="Hidden projects aren't on the website. Tick Published to show it.">
+                  Not on the site
+                </span>
+              )}
+            </div>
           </li>
         ))}
       </ul>

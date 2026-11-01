@@ -1,6 +1,7 @@
-import { CheckCircle2, ChevronRight, MapPin, Phone } from "lucide-react";
+import { ChevronRight, MapPin, Phone } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { amenityIcon } from "@/lib/amenity-icon";
 import { notFound } from "next/navigation";
 import { Suspense, ViewTransition } from "react";
 import { EmiCalculator } from "@/components/emi-calculator";
@@ -132,13 +133,21 @@ async function PropertyDetails({ params }: Pick<PageProps<"/properties/[slug]">,
             {property.amenities.length > 0 && (
               <section>
                 <h2 className="text-2xl">Features &amp; amenities</h2>
-                <ul className="mt-5 grid gap-3 sm:grid-cols-2">
-                  {property.amenities.map((a) => (
-                    <li key={a} className="reveal flex items-start gap-3 rounded-xl bg-white p-3.5 ring-1 ring-slate-200">
-                      <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-green-600" aria-hidden />
-                      <span className="text-sm text-slate-700">{a}</span>
-                    </li>
-                  ))}
+                <ul className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+                  {property.amenities.map((a) => {
+                    const Icon = amenityIcon(a);
+                    return (
+                      <li
+                        key={a}
+                        className="reveal flex flex-col items-center justify-center gap-3 rounded-2xl bg-white px-3 py-6 text-center ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-card"
+                      >
+                        <span className="inline-flex size-14 items-center justify-center rounded-2xl bg-gold-100 text-gold-700">
+                          <Icon className="size-7" strokeWidth={1.6} aria-hidden />
+                        </span>
+                        <span className="text-[15px] leading-snug font-medium text-navy-900">{a}</span>
+                      </li>
+                    );
+                  })}
                 </ul>
               </section>
             )}

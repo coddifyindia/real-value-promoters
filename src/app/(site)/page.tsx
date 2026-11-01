@@ -144,7 +144,7 @@ export default async function HomePage() {
               <Sparkles className="size-3.5 text-gold-300" aria-hidden />
               DTCP &amp; RERA approved · {properties.length} live projects
             </p>
-            <h1 className="mt-5 max-w-3xl text-4xl leading-[1.02] text-white sm:text-6xl xl:text-7xl">
+            <h1 className="mt-5 max-w-3xl text-4xl leading-[1.1] text-white sm:text-6xl sm:leading-[1.08] xl:text-7xl">
               <SplitText on="load" delay={2} text="Own land you can be proud of, in places that" />{" "}
               <SplitText
                 on="load"
@@ -221,7 +221,7 @@ export default async function HomePage() {
             >
               <div className="container-x">
                 <p className="font-display text-8xl text-gold-400/90 italic">{c.number}</p>
-                <h2 className="mt-2 max-w-xl text-6xl leading-[1.02] text-white">{c.title}</h2>
+                <h2 className="mt-2 max-w-xl text-6xl leading-[1.08] text-white">{c.title}</h2>
                 <p className="mt-6 max-w-md text-lg text-white/75">{c.text}</p>
                 <div className="mt-8 flex flex-wrap items-center gap-3">
                   {c.legend.map(([swatch, label]) => (
@@ -246,29 +246,31 @@ export default async function HomePage() {
             </div>
           ))}
 
-          {/* Chapter rail + scroll cue */}
-          <ol aria-hidden className="pointer-events-none absolute top-1/2 right-8 hidden -translate-y-1/2 flex-col gap-5 rounded-2xl border border-white/10 bg-navy-950/55 px-5 py-4 text-right text-xs tracking-[0.2em] text-white/50 uppercase backdrop-blur-md motion-safe:lg:flex">
-            {["The layout", "Approved plots", "Your home"].map((label, i) => (
-              <li
-                key={label}
-                className={`flex items-center justify-end gap-3 transition-colors duration-500 ${
-                  ["group-data-[chapter=1]/hero:text-white", "group-data-[chapter=2]/hero:text-white", "group-data-[chapter=3]/hero:text-white"][i]
-                }`}
-              >
-                {label}
-                <span
-                  className={`h-px w-6 bg-current transition-all duration-500 ${
-                    ["group-data-[chapter=1]/hero:w-12 group-data-[chapter=1]/hero:bg-gold-400", "group-data-[chapter=2]/hero:w-12 group-data-[chapter=2]/hero:bg-gold-400", "group-data-[chapter=3]/hero:w-12 group-data-[chapter=3]/hero:bg-gold-400"][i]
+          {/* Chapter rail + scroll cue: bottom-right corner, clear of the copy and the numbers. */}
+          <div aria-hidden className="pointer-events-none absolute right-8 bottom-8 hidden flex-col items-end gap-4 motion-safe:lg:flex">
+            <ol className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-navy-950/60 px-5 py-4 text-right text-[11px] tracking-[0.2em] text-white/50 uppercase backdrop-blur-md">
+              {["The layout", "Approved plots", "Your home"].map((label, i) => (
+                <li
+                  key={label}
+                  className={`flex items-center justify-end gap-3 transition-colors duration-500 ${
+                    ["group-data-[chapter=1]/hero:text-white", "group-data-[chapter=2]/hero:text-white", "group-data-[chapter=3]/hero:text-white"][i]
                   }`}
-                />
-              </li>
-            ))}
-          </ol>
-          <div aria-hidden className="scroll-cue pointer-events-none absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 text-[11px] tracking-[0.25em] text-white/60 uppercase transition-opacity duration-500 group-data-[chapter=3]/hero:opacity-0 motion-safe:lg:flex">
-            Scroll to explore the layout
-            <span className="relative h-12 w-px overflow-hidden bg-white/20">
-              <span className="absolute inset-x-0 top-0 h-1/2 bg-gold-400" />
-            </span>
+                >
+                  {label}
+                  <span
+                    className={`h-px w-5 bg-current transition-all duration-500 ${
+                      ["group-data-[chapter=1]/hero:w-10 group-data-[chapter=1]/hero:bg-gold-400", "group-data-[chapter=2]/hero:w-10 group-data-[chapter=2]/hero:bg-gold-400", "group-data-[chapter=3]/hero:w-10 group-data-[chapter=3]/hero:bg-gold-400"][i]
+                    }`}
+                  />
+                </li>
+              ))}
+            </ol>
+            <div className="scroll-cue flex items-center gap-3 text-[11px] tracking-[0.25em] text-white/60 uppercase transition-opacity duration-500 group-data-[chapter=3]/hero:opacity-0">
+              Scroll to explore
+              <span className="relative h-8 w-px overflow-hidden bg-white/20">
+                <span className="absolute inset-x-0 top-0 h-1/2 bg-gold-400" />
+              </span>
+            </div>
           </div>
         </div>
       </section>

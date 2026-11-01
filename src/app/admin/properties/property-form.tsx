@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionSubmit } from "@/components/form-meta";
-import { ArrowLeft, ArrowRight, ImagePlus, Loader2, Star, Trash2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, ExternalLink, ImagePlus, Loader2, Star, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useActionState, useId, useRef, useState } from "react";
 import { saveProperty } from "@/app/actions/admin";
@@ -266,16 +266,22 @@ export function PropertyForm({ property }: { property?: Property }) {
         </label>
       </section>
 
-      <div className="sticky bottom-0 -mx-4 flex items-center gap-4 border-t border-slate-200 bg-white/95 px-4 py-4 shadow-[0_-8px_24px_-16px_rgb(11_31_58/0.25)] backdrop-blur sm:mx-0 sm:rounded-2xl sm:border sm:px-6">
-        <button type="submit" disabled={pending || uploading > 0} className="btn-primary btn-lg">
-          {pending && <Loader2 className="size-4 animate-spin" aria-hidden />}
-          {property ? "Save changes" : "Create property"}
-        </button>
+      {/* Actions: plain buttons at the end of the form, no extra panel around them. */}
+      <div className="flex flex-col-reverse items-stretch gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-end">
         {state.message && (
-          <p className={`text-sm ${state.status === "error" ? "text-red-600" : "text-green-700"}`} role="status">
+          <p className={`text-sm sm:mr-auto ${state.status === "error" ? "text-red-600" : "text-green-700"}`} role="status">
             {state.message}
           </p>
         )}
+        {property?.published && (
+          <a href={`/properties/${property.slug}`} target="_blank" rel="noopener" className="btn-outline btn-lg">
+            <ExternalLink className="size-4" aria-hidden /> Preview on site
+          </a>
+        )}
+        <button type="submit" disabled={pending || uploading > 0} className="btn-primary btn-lg min-w-48">
+          {pending && <Loader2 className="size-4 animate-spin" aria-hidden />}
+          {property ? "Save changes" : "Create property"}
+        </button>
       </div>
     </form>
   );

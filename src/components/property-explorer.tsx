@@ -116,7 +116,7 @@ export function PropertyExplorer({ properties, cities }: { properties: Property[
               setQuery("");
               router.replace(pathname, { scroll: false });
             }}
-            className="inline-flex items-center gap-1 text-sm font-medium text-brand-700 hover:underline"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-red-50 px-4 text-sm font-semibold text-red-700 ring-1 ring-red-200 transition-colors hover:bg-red-100 hover:ring-red-300"
           >
             <X className="size-4" aria-hidden /> Clear filters
           </button>

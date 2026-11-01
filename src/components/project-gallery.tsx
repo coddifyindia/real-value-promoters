@@ -1,24 +1,25 @@
 import { ArrowRight, ArrowUpRight, MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { Carousel } from "./carousel";
 import { LinkPending } from "./link-pending";
 import { SplitText } from "./motion";
 import { ShortlistButton } from "./shortlist-button";
 import { PROPERTY_TYPE_LABELS, type Property } from "@/lib/types";
 
 /**
- * Signature projects as a horizontal gallery. On large screens the section is
- * pinned and vertical scrolling slides the track sideways (CSS scroll-driven
- * animation, see globals.css); elsewhere it's a swipeable, snapping row.
+ * Signature projects as a horizontal row the visitor controls: swipe, trackpad,
+ * the ← → buttons or arrow keys (see carousel.tsx). Page scrolling is never
+ * hijacked to move it sideways.
  */
 export function ProjectGallery({ properties, total }: { properties: Property[]; total: number }) {
   return (
-    <section aria-labelledby="projects-title" className="gallery relative bg-sand-50">
-      <div className="gallery-stage flex flex-col justify-center overflow-hidden py-16 sm:py-24">
+    <section aria-labelledby="projects-title" className="relative bg-sand-50">
+      <div className="overflow-hidden py-16 sm:py-24">
         <div className="container-x flex flex-wrap items-end justify-between gap-6">
           <div>
             <p className="eyebrow">Signature projects</p>
-            <h2 id="projects-title" className="mt-2 text-4xl leading-[1.02] sm:text-6xl">
+            <h2 id="projects-title" className="mt-2 text-4xl leading-[1.1] sm:text-6xl sm:leading-[1.08]">
               <SplitText text="Land worth coming home to." />
             </h2>
           </div>
@@ -32,10 +33,10 @@ export function ProjectGallery({ properties, total }: { properties: Property[]; 
           </Link>
         </div>
 
-        <div className="gallery-viewport mt-10 sm:mt-14">
-          <ul className="gallery-track flex w-max gap-5 px-4 sm:gap-8 sm:px-6 lg:px-[max(2rem,calc((100vw-80rem)/2+2rem))]">
+        <Carousel label="Signature projects">
+          <ul className="mt-10 flex w-max gap-5 sm:mt-14 px-4 sm:gap-8 sm:px-6 lg:px-[max(2rem,calc((100vw-80rem)/2+2rem))]">
             {properties.map((p, i) => (
-              <li key={p.id} className="gallery-panel group relative w-[82vw] shrink-0 snap-start sm:w-[54vw] lg:w-[min(34vw,520px)]" data-cursor="View project">
+              <li key={p.id} className="group relative w-[82vw] shrink-0 snap-start sm:w-[54vw] lg:w-[min(34vw,520px)]">
                 <div className="relative aspect-[4/5] overflow-hidden rounded-[1.75rem] bg-navy-900">
                   {p.images[0] && (
                     <Image
@@ -80,7 +81,7 @@ export function ProjectGallery({ properties, total }: { properties: Property[]; 
                 </div>
               </li>
             ))}
-            <li className="gallery-panel relative flex w-[82vw] shrink-0 snap-start sm:w-[54vw] lg:w-[min(28vw,420px)]">
+            <li className="relative flex w-[82vw] shrink-0 snap-start sm:w-[54vw] lg:w-[min(28vw,420px)]">
               <Link
                 href="/properties"
                 className="group flex aspect-[4/5] w-full flex-col justify-between rounded-[1.75rem] border border-navy-900/15 p-8 transition-colors hover:bg-navy-900 hover:text-white"
@@ -95,7 +96,7 @@ export function ProjectGallery({ properties, total }: { properties: Property[]; 
               </Link>
             </li>
           </ul>
-        </div>
+        </Carousel>
       </div>
     </section>
   );

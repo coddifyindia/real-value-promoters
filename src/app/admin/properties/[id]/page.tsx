@@ -49,8 +49,8 @@ async function Editor({ params }: Pick<PageProps<"/admin/properties/[id]">, "par
         <Link href="/admin/properties" className="inline-flex h-10 items-center text-sm text-slate-500 hover:text-navy-900">← All properties</Link>
         <PageHeader title={property.name} description="Changes go live on the website as soon as you save.">
           {property.published && (
-            <Link href={`/properties/${property.slug}`} target="_blank" className="btn-outline">
-              <ExternalLink className="size-4" aria-hidden /> View on site
+            <Link href={`/properties/${property.slug}`} target="_blank" rel="noopener" className="btn-outline">
+              <ExternalLink className="size-4" aria-hidden /> Preview on site
             </Link>
           )}
         </PageHeader>
