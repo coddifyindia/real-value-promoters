@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Inter } from "next/font/google";
+import { Analytics } from "@/components/analytics";
 import { JsonLd } from "@/components/json-ld";
 import { site } from "@/lib/site";
 import "./globals.css";
@@ -65,6 +66,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-dvh flex-col">
         {children}
         <JsonLd data={organization} />
+        {/* The analytics script is served by Vercel's edge; skip it elsewhere (local, CI). */}
+        {process.env.VERCEL && <Analytics />}
       </body>
     </html>
   );

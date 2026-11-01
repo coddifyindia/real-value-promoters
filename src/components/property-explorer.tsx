@@ -57,19 +57,19 @@ export function PropertyExplorer({ properties, cities }: { properties: Property[
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_auto_auto_auto]">
           <label className="relative sm:col-span-2 lg:col-span-1">
             <span className="sr-only">Search properties</span>
-            <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-slate-400" aria-hidden />
+            <Search className="pointer-events-none absolute top-1/2 left-4 size-[18px] -translate-y-1/2 text-slate-400" aria-hidden />
             <input
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onBlur={() => update("q", query.trim())}
               placeholder="Search by name, area or amenity"
-              className="field pl-10"
+              className="field field-icon"
             />
           </label>
           <label>
             <span className="sr-only">City</span>
-            <select value={city} onChange={(e) => update("city", e.target.value)} className="field lg:w-44">
+            <select value={city} onChange={(e) => update("city", e.target.value)} className="field select-field lg:w-44">
               <option value="">All cities</option>
               {cities.map((c) => (
                 <option key={c} value={c}>
@@ -80,7 +80,7 @@ export function PropertyExplorer({ properties, cities }: { properties: Property[
           </label>
           <label>
             <span className="sr-only">Property type</span>
-            <select value={type} onChange={(e) => update("type", e.target.value)} className="field lg:w-40">
+            <select value={type} onChange={(e) => update("type", e.target.value)} className="field select-field lg:w-40">
               <option value="">All types</option>
               {PROPERTY_TYPES.filter((t) => t !== "plot_villa").map((t) => (
                 <option key={t} value={t}>
@@ -92,8 +92,8 @@ export function PropertyExplorer({ properties, cities }: { properties: Property[
           <label className="sm:col-span-2 lg:col-span-1">
             <span className="sr-only">Sort by</span>
             <div className="relative">
-              <SlidersHorizontal className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-slate-400" aria-hidden />
-              <select value={sort} onChange={(e) => update("sort", e.target.value === "featured" ? "" : e.target.value)} className="field pl-10 lg:w-52">
+              <SlidersHorizontal className="pointer-events-none absolute top-1/2 left-4 size-[18px] -translate-y-1/2 text-slate-400" aria-hidden />
+              <select value={sort} onChange={(e) => update("sort", e.target.value === "featured" ? "" : e.target.value)} className="field field-icon select-field lg:w-56">
                 {Object.entries(SORTS).map(([k, v]) => (
                   <option key={k} value={k}>
                     {v}
@@ -116,7 +116,7 @@ export function PropertyExplorer({ properties, cities }: { properties: Property[
               setQuery("");
               router.replace(pathname, { scroll: false });
             }}
-            className="inline-flex items-center gap-1 text-sm font-medium text-brand-700 hover:underline"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-red-50 px-4 text-sm font-semibold text-red-700 ring-1 ring-red-200 transition-colors hover:bg-red-100 hover:ring-red-300"
           >
             <X className="size-4" aria-hidden /> Clear filters
           </button>

@@ -13,6 +13,8 @@ type LeadEmail = {
   propertyName: string | null;
   propertyUrl: string | null;
   preferredDate: string;
+  /** True when the database was down and this email is the only record of the lead. */
+  unsaved?: boolean;
 };
 
 const esc = (s: string) =>
@@ -55,7 +57,10 @@ function teamEmail(l: LeadEmail) {
   ].join("");
   const digits = l.phone.replace(/\D/g, "");
   const wa = `https://wa.me/${digits.length === 10 ? `91${digits}` : digits}`;
-  const body = `<table role="presentation" cellpadding="0" cellspacing="0">${rows}</table>
+  const warning = l.unsaved
+    ? `<p style="margin:0 0 16px;padding:12px;border-radius:8px;background:#fef2f2;color:#991b1b;font-weight:bold">The database was unavailable, so this lead is NOT in the admin inbox. Please call back from this email.</p>`
+    : "";
+  const body = `${warning}<table role="presentation" cellpadding="0" cellspacing="0">${rows}</table>
 <p style="margin:24px 0 0"><a href="${wa}" style="background:#16a34a;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:bold">WhatsApp ${esc(l.name.split(" ")[0])}</a>
 &nbsp; <a href="${esc(site.url)}/admin" style="color:#1e4fa3">Open in admin</a></p>`;
   return layout(`New ${LEAD_KIND_LABELS[l.kind].toLowerCase()}`, body);
@@ -76,7 +81,8 @@ ${visit}
   return layout("We've received your enquiry", body);
 }
 
-export async function sendLeadEmails(lead: LeadEmail) {
+/** Sends both emails. Resolves true when the team alert was accepted by Resend. */
+export async function sendLeadEmails(lead: LeadEmail): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.RESEND_FROM_EMAIL;
   const team = (process.env.LEADS_NOTIFY_EMAIL ?? site.email)
@@ -86,7 +92,7 @@ export async function sendLeadEmails(lead: LeadEmail) {
 
   if (!apiKey || !from) {
     console.warn(`[email] RESEND_API_KEY/RESEND_FROM_EMAIL not set; skipped emails for lead ${lead.id}`);
-    return;
+    return false;
   }
 
   const resend = new Resend(apiKey);
@@ -97,7 +103,7 @@ export async function sendLeadEmails(lead: LeadEmail) {
         from,
         to: team,
         replyTo: lead.email,
-        subject: `New ${LEAD_KIND_LABELS[lead.kind].toLowerCase()}: ${lead.name}${subjectFor}`,
+        subject: `${lead.unsaved ? "[NOT SAVED] " : ""}New ${LEAD_KIND_LABELS[lead.kind].toLowerCase()}: ${lead.name}${subjectFor}`,
         html: teamEmail(lead),
       },
       { idempotencyKey: `lead-team-${lead.id}` },
@@ -119,4 +125,6 @@ export async function sendLeadEmails(lead: LeadEmail) {
     if (r.status === "rejected") console.error(`[email] ${who} email failed for lead ${lead.id}`, r.reason);
     else if (r.value.error) console.error(`[email] ${who} email failed for lead ${lead.id}`, r.value.error);
   });
+  const team0 = results[0];
+  return team0.status === "fulfilled" && !team0.value.error;
 }

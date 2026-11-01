@@ -44,6 +44,40 @@ not in chat or email:
 
    Repeat steps 6–7 for each team member who should see leads.
 
+### Updating an existing database (automatic)
+
+New files in `supabase/migrations/` are applied **automatically on every production deploy**.
+Before Vercel builds the new version of the site, `scripts/migrate.mjs` connects to the
+database and applies any migration it hasn't had yet. Preview deployments never touch the
+live database. If a migration fails, that deploy stops and the current site keeps running.
+
+To turn it on (once):
+
+1. In Supabase, click **Connect** (top of the project) and choose **Session pooler**.
+   Copy the connection string and put your database password in place of `[YOUR-PASSWORD]`,
+   **exactly as it is**: no brackets, and no need to encode symbols such as `@ : / # ? %`.
+   The build encodes the password correctly itself (`scripts/db-url.mjs`), and still works if
+   it was already encoded. If `[YOUR-PASSWORD]` is left in, the deploy stops with a message
+   saying so.
+   Use the *Session pooler* string, not *Direct connection*: the direct one needs IPv6,
+   which Vercel's build machines don't have.
+2. In Vercel, go to **Settings → Environment Variables** and add `SUPABASE_DB_URL` with that
+   string. Tick **Production only** (not Preview or Development) and mark it **Sensitive**.
+   It never goes into GitHub, chat or email.
+3. Redeploy production. The build log shows `[migrate]` lines. The first run on a database
+   that was set up by pasting into the SQL Editor also prints *"recording 20261029000000 as
+   already applied (one-off baseline)"*. That is expected: it tells the migration tool the
+   tables already exist, so it doesn't try to create them again.
+
+Without `SUPABASE_DB_URL` the build still succeeds but prints a warning, and new migrations
+have to be pasted into **SQL Editor → New query** by hand. The site keeps working either way;
+a feature that needs a newer migration stays off until it's applied.
+
+| File | Adds |
+| --- | --- |
+| `20261029000000_init.sql` | Tables, security rules and storage for the whole site |
+| `20261031000000_subscriber_rate_limit.sql` | Per-connection limit on newsletter sign-ups |
+
 ## 2. Vercel: hosting
 
 Your current site already runs on Vercel, so you'll point it at this repository.
@@ -51,13 +85,15 @@ Your current site already runs on Vercel, so you'll point it at this repository.
 1. Go to <https://vercel.com> → open the project that serves realvaluepromoters.com.
 2. **Settings → Git**: connect the repository `coddifyindia/real-value-promoters`
    (if the old project is tied to another repo, it's simpler to create a **new project**
-   from this repo and move the domain in step 2.6).
+   from this repo and move the domain in step 2.7).
 3. **Settings → Environment Variables**: add every variable from [`.env.example`](.env.example)
    for **Production** and **Preview**. Leave the Resend ones for now if step 3 isn't done;
    forms still save leads without them.
 4. **Settings → Functions → Function Region**: choose **Mumbai (bom1)**.
-5. **Deployments → Redeploy** (or push a commit). Open the `.vercel.app` URL and check the site.
-6. **Settings → Domains**: add `www.realvaluepromoters.com` and `realvaluepromoters.com`
+5. **Analytics → Enable** (Web Analytics). Free, cookie-free page-view stats; the site already
+   includes the tracking code. Lead, call and WhatsApp-click events also appear there on the Pro plan.
+6. **Deployments → Redeploy** (or push a commit). Open the `.vercel.app` URL and check the site.
+7. **Settings → Domains**: add `www.realvaluepromoters.com` and `realvaluepromoters.com`
    to this project (remove them from the old project first if you created a new one).
 
 Old links such as `/properties/1` redirect to the new addresses automatically, so

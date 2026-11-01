@@ -6,7 +6,8 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/auth";
 import { PROPERTIES_TAG } from "@/lib/properties";
 import { createSessionClient } from "@/lib/supabase/server";
-import { LEAD_STATUSES, PROPERTY_TYPES } from "@/lib/types";
+import { lines, parseJsonArray, propertySchema } from "@/lib/property-schema";
+import { LEAD_STATUSES } from "@/lib/types";
 import { fieldErrorsOf, type FormState } from "@/lib/validation";
 
 export async function signIn(_prev: FormState, formData: FormData): Promise<FormState> {
@@ -14,9 +15,18 @@ export async function signIn(_prev: FormState, formData: FormData): Promise<Form
   const password = String(formData.get("password") ?? "");
   if (!email || !password) return { status: "error", message: "Enter your email and password." };
 
-  const supabase = await createSessionClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) return { status: "error", message: "Incorrect email or password." };
+  try {
+    const supabase = await createSessionClient();
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      // Supabase rate-limits repeated attempts (status 429); say so instead of "wrong password".
+      if (error.status === 429) return { status: "error", message: "Too many attempts. Wait a minute and try again." };
+      return { status: "error", message: "Incorrect email or password." };
+    }
+  } catch (err) {
+    console.error("[admin] sign-in failed", err);
+    return { status: "error", message: "Sign-in is unavailable right now. Please try again shortly." };
+  }
   redirect("/admin");
 }
 
@@ -41,56 +51,12 @@ export async function updateLead(_prev: FormState, formData: FormData): Promise<
     .from("leads")
     .update({ status: parsed.data.status, notes: parsed.data.notes || null })
     .eq("id", parsed.data.id);
-  if (error) return { status: "error", message: error.message };
+  if (error) {
+    console.error("[admin] lead update failed", error);
+    return { status: "error", message: "Couldn't save. Please try again." };
+  }
   return { status: "success", message: "Saved" };
 }
-
-const lines = (v: unknown) =>
-  String(v ?? "")
-    .split("\n")
-    .map((s) => s.trim())
-    .filter(Boolean);
-
-const optionalUrl = z
-  .string()
-  .trim()
-  .transform((v) => v || null)
-  .pipe(z.url().startsWith("https://", "Must start with https://").nullable());
-
-const propertySchema = z.object({
-  id: z.uuid().optional(),
-  name: z.string().trim().min(2, "Name is required").max(120),
-  slug: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Use lowercase letters, numbers and hyphens only"),
-  location: z.string().trim().min(2, "Location is required").max(200),
-  city: z.string().trim().min(2, "City is required").max(60),
-  type: z.enum(PROPERTY_TYPES),
-  price_label: z.string().trim().min(1, "Price is required").max(80),
-  price_from: z
-    .string()
-    .trim()
-    .transform((v) => (v ? Number(v.replace(/[,\s]/g, "")) : null))
-    .pipe(z.number().int().nonnegative("Must be a whole number of rupees").nullable()),
-  description: z.string().trim().max(5000),
-  amenities: z.array(z.string().max(120)).max(60),
-  images: z.array(z.string().min(1)).max(80),
-  contact_name: z.string().trim().max(80).transform((v) => v || null),
-  contact_phones: z.array(z.string().regex(/^\+?\d{10,15}$/, "Phone numbers must be 10–15 digits")).max(5),
-  youtube_id: z
-    .string()
-    .trim()
-    .transform((v) => v.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/)?.[1] ?? v)
-    .pipe(z.union([z.literal(""), z.string().regex(/^[\w-]{11}$/, "Paste a YouTube link or video id")]))
-    .transform((v) => v || null),
-  map_embed_url: optionalUrl,
-  instagram_url: optionalUrl,
-  featured: z.boolean(),
-  published: z.boolean(),
-  sort_order: z.coerce.number().int(),
-});
 
 // The data tag covers every page that lists properties. Detail pages (and the
 // shell new slugs render from) are prerendered with that data baked in, so
@@ -106,7 +72,7 @@ export async function saveProperty(_prev: FormState, formData: FormData): Promis
     ...raw,
     id: raw.id || undefined,
     amenities: lines(raw.amenities),
-    images: JSON.parse(String(raw.images ?? "[]")),
+    images: parseJsonArray(raw.images),
     contact_phones: lines(String(raw.contact_phones ?? "").replace(/,/g, "\n")).map((p) => p.replace(/[\s()-]/g, "")),
     featured: raw.featured === "on",
     published: raw.published === "on",
@@ -123,8 +89,12 @@ export async function saveProperty(_prev: FormState, formData: FormData): Promis
   const { data, error } = await query;
 
   if (error) {
-    const message = error.code === "23505" ? "That URL slug is already used by another property." : error.message;
-    return { status: "error", message, fieldErrors: error.code === "23505" ? { slug: message } : undefined };
+    if (error.code === "23505") {
+      const message = "That URL slug is already used by another property.";
+      return { status: "error", message, fieldErrors: { slug: message } };
+    }
+    console.error("[admin] property save failed", error);
+    return { status: "error", message: "Couldn't save the property. Please try again." };
   }
 
   refreshPublicPages();
@@ -136,7 +106,8 @@ export async function deleteProperty(formData: FormData) {
   const id = z.uuid().parse(formData.get("id"));
   const { supabase } = await requireAdmin();
   const { error } = await supabase.from("properties").delete().eq("id", id);
-  if (error) throw new Error(error.message);
+  // Shown by app/admin/error.tsx with a retry button; the message stays server-side.
+  if (error) throw new Error("Property delete failed", { cause: error });
   refreshPublicPages();
   redirect("/admin/properties");
 }

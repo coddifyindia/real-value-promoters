@@ -1,12 +1,14 @@
-import { ExternalLink } from "lucide-react";
+import { ArrowLeft, Building2, ExternalLink, PencilLine, TriangleAlert } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { FormSkeleton } from "@/components/skeletons";
 import { deleteProperty } from "@/app/actions/admin";
 import { requireAdmin } from "@/lib/auth";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import type { Property } from "@/lib/types";
+import { PageHeader } from "../../page-header";
 import { SetupNotice } from "../../setup-notice";
 import { DeletePropertyButton, PropertyForm } from "../property-form";
 
@@ -17,7 +19,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export default function EditPropertyPage({ params }: PageProps<"/admin/properties/[id]">) {
   if (!isSupabaseConfigured) return <SetupNotice />;
   return (
-    <Suspense fallback={<p className="text-slate-500">Loading…</p>}>
+    <Suspense fallback={<FormSkeleton label="Loading property" />}>
       <Editor params={params} />
     </Suspense>
   );
@@ -29,8 +31,8 @@ async function Editor({ params }: Pick<PageProps<"/admin/properties/[id]">, "par
 
   if (id === "new") {
     return (
-      <div className="space-y-6">
-        <h1 className="text-3xl">Add property</h1>
+      <div className="space-y-8">
+        <PageHeader title="Add property" icon={Building2} description="Fill in the details below. You can save it hidden and publish later." />
         <PropertyForm />
       </div>
     );
@@ -42,24 +44,26 @@ async function Editor({ params }: Pick<PageProps<"/admin/properties/[id]">, "par
   const property = data as Property;
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <Link href="/admin/properties" className="text-sm text-slate-500 hover:text-navy-900">← All properties</Link>
-          <h1 className="mt-1 text-3xl">{property.name}</h1>
-        </div>
-        {property.published && (
-          <Link href={`/properties/${property.slug}`} target="_blank" className="btn-outline">
-            <ExternalLink className="size-4" aria-hidden /> View on site
-          </Link>
-        )}
+    <div className="space-y-8">
+      <div>
+        <Link href="/admin/properties" className="inline-flex h-10 items-center gap-1.5 text-sm text-slate-500 hover:text-navy-900"><ArrowLeft className="size-4" aria-hidden /> All properties</Link>
+        <PageHeader title={property.name} icon={PencilLine} description="Changes go live on the website as soon as you save.">
+          {property.published && (
+            <Link href={`/properties/${property.slug}`} target="_blank" rel="noopener" className="btn-outline">
+              <ExternalLink className="size-4" aria-hidden /> Preview on site
+            </Link>
+          )}
+        </PageHeader>
       </div>
       <PropertyForm property={property} />
-      <form action={deleteProperty} className="rounded-2xl border border-red-200 bg-red-50 p-4">
+      <form action={deleteProperty} className="rounded-2xl border border-red-200 bg-red-50 p-6 sm:p-8">
         <input type="hidden" name="id" value={property.id} />
-        <p className="text-sm text-red-800">
+        <p className="flex gap-2 text-sm text-red-800">
+          <TriangleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
+          <span>
           Deleting removes this property from the website permanently. Leads that mention it are kept. To hide it
           temporarily, untick <strong>Published</strong> instead.
+          </span>
         </p>
         <DeletePropertyButton />
       </form>

@@ -27,15 +27,22 @@ export async function getPublishedProperties(): Promise<Property[]> {
 
   if (!isSupabaseConfigured) return seedProperties();
 
-  const { data, error } = await createPublicClient()
-    .from("properties")
-    .select(COLUMNS)
-    .eq("published", true)
-    .order("sort_order", { ascending: true })
-    .order("created_at", { ascending: false });
-
-  if (error) throw new Error(`Failed to load properties: ${error.message}`);
-  return data as Property[];
+  // One retry absorbs a dropped connection or cold start. If both fail the error
+  // propagates: Next keeps serving the last good cached copy where it has one,
+  // and the route's error.tsx shows a designed "try again" page otherwise.
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    const { data, error } = await createPublicClient()
+      .from("properties")
+      .select(COLUMNS)
+      .eq("published", true)
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: false });
+    if (!error) return data as Property[];
+    lastError = error;
+    console.error(`[properties] load failed (attempt ${attempt})`, error.message);
+  }
+  throw new Error("Couldn't load properties", { cause: lastError });
 }
 
 export async function getPropertyBySlug(slug: string) {

@@ -1,5 +1,6 @@
 import "server-only";
 import { createClient } from "@supabase/supabase-js";
+import { fetchWithTimeout } from "./fetch";
 import { supabaseUrl } from "./config";
 
 // Secret-key client: bypasses RLS. Only for server code that has already
@@ -11,5 +12,6 @@ export function createServiceClient() {
   }
   return createClient(supabaseUrl, secret, {
     auth: { persistSession: false, autoRefreshToken: false },
+    global: { fetch: fetchWithTimeout(10000) },
   });
 }

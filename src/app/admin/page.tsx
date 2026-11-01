@@ -1,7 +1,24 @@
-import { CalendarDays, Download, Mail, Phone } from "lucide-react";
+import {
+  CalendarCheck,
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Download,
+  Inbox,
+  Link2,
+  type LucideIcon,
+  Mail,
+  MessageSquareText,
+  Phone,
+  Search,
+  SearchX,
+  SlidersHorizontal,
+} from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
+import { TableSkeleton } from "@/components/skeletons";
 import { WhatsAppIcon } from "@/components/icons";
 import { requireAdmin } from "@/lib/auth";
 import { telLink } from "@/lib/site";
@@ -16,6 +33,7 @@ import {
   type LeadStatus,
 } from "@/lib/types";
 import { LeadEditor } from "./lead-editor";
+import { PageHeader, Stat } from "./page-header";
 import { SetupNotice } from "./setup-notice";
 
 export const metadata: Metadata = { title: "Leads" };
@@ -25,7 +43,7 @@ const PAGE_SIZE = 50;
 export default function LeadsPage({ searchParams }: PageProps<"/admin">) {
   if (!isSupabaseConfigured) return <SetupNotice />;
   return (
-    <Suspense fallback={<p className="text-slate-500">Loading leads…</p>}>
+    <Suspense fallback={<TableSkeleton label="Loading leads" />}>
       <Leads searchParams={searchParams} />
     </Suspense>
   );
@@ -82,42 +100,66 @@ async function Leads({ searchParams }: Pick<PageProps<"/admin">, "searchParams">
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-3xl">Leads</h1>
-          <p className="mt-1 text-sm text-slate-600">
-            <strong className="text-blue-700">{newCount ?? 0} new</strong> · {count ?? 0} matching
-          </p>
-        </div>
+    <div className="space-y-8">
+      <PageHeader
+        title="Leads"
+        icon={Inbox}
+        description="Everyone who sent an enquiry, booked a site visit or asked for a callback on the website. Newest first."
+        meta={
+          <>
+            <Stat tone="blue">{newCount ?? 0} new</Stat>
+            <Stat>{count ?? 0} matching</Stat>
+          </>
+        }
+      >
         <a href={`/admin/leads/export${qs({ page: "" })}`} className="btn-outline">
           <Download className="size-4" aria-hidden /> Export CSV
         </a>
-      </div>
+      </PageHeader>
 
-      <form className="grid gap-2 rounded-2xl bg-white p-3 ring-1 ring-slate-200 sm:grid-cols-[1fr_auto_auto_auto]">
-        <input name="q" defaultValue={q} placeholder="Search name, phone, email, property" className="field" aria-label="Search" />
-        <select name="status" defaultValue={status} className="field" aria-label="Status">
-          <option value="">All except spam</option>
-          {LEAD_STATUSES.map((s) => (
-            <option key={s} value={s}>{LEAD_STATUS_LABELS[s]}</option>
-          ))}
-        </select>
-        <select name="kind" defaultValue={kind} className="field" aria-label="Type">
-          <option value="">All types</option>
-          {LEAD_KINDS.map((k) => (
-            <option key={k} value={k}>{LEAD_KIND_LABELS[k]}</option>
-          ))}
-        </select>
-        <button type="submit" className="btn-primary">Filter</button>
+      <form className="grid gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200 sm:grid-cols-2 sm:p-5 lg:grid-cols-[minmax(0,1fr)_220px_220px_auto]">
+        <label className="sm:col-span-2 lg:col-span-1">
+          <span className="label">Search</span>
+          <span className="relative block">
+            <Search className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-slate-400" aria-hidden />
+            <input name="q" defaultValue={q} placeholder="Name, phone, email or property" className="field field-icon" />
+          </span>
+        </label>
+        <label>
+          <span className="label">Status</span>
+          <select name="status" defaultValue={status} className="field select-field">
+            <option value="">All except spam</option>
+            {LEAD_STATUSES.map((s) => (
+              <option key={s} value={s}>{LEAD_STATUS_LABELS[s]}</option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span className="label">Type</span>
+          <select name="kind" defaultValue={kind} className="field select-field">
+            <option value="">All types</option>
+            {LEAD_KINDS.map((k) => (
+              <option key={k} value={k}>{LEAD_KIND_LABELS[k]}</option>
+            ))}
+          </select>
+        </label>
+        <button type="submit" className="btn-primary self-end sm:col-span-2 lg:col-span-1">
+          <SlidersHorizontal className="size-4" aria-hidden /> Apply filters
+        </button>
       </form>
 
       {leads.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-slate-500">
-          No leads yet. They&apos;ll appear here as soon as someone submits a form.
-        </p>
+        <div className="flex flex-col items-center rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
+          <span className="mb-4 inline-flex size-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-500">
+            {q || status || kind ? <SearchX className="size-6" aria-hidden /> : <Inbox className="size-6" aria-hidden />}
+          </span>
+          <p className="font-display text-xl text-navy-900">{q || status || kind ? "No leads match these filters" : "No leads yet"}</p>
+          <p className="mt-2 text-slate-500">
+            {q || status || kind ? "Try clearing the search or choosing another status." : "They'll appear here as soon as someone submits a form on the website."}
+          </p>
+        </div>
       ) : (
-        <ul className="space-y-3">
+        <ul className="space-y-4">
           {leads.map((lead) => (
             <LeadCard key={lead.id} lead={lead} />
           ))}
@@ -126,16 +168,23 @@ async function Leads({ searchParams }: Pick<PageProps<"/admin">, "searchParams">
 
       {totalPages > 1 && (
         <nav className="flex items-center justify-between text-sm" aria-label="Pagination">
-          {page > 1 ? <Link href={`/admin${qs({ page: page - 1 })}`} className="btn-outline">Previous</Link> : <span />}
+          {page > 1 ? <Link href={`/admin${qs({ page: page - 1 })}`} className="btn-outline"><ChevronLeft className="size-4" aria-hidden /> Previous</Link> : <span />}
           <span className="text-slate-500">Page {page} of {totalPages}</span>
-          {page < totalPages ? <Link href={`/admin${qs({ page: page + 1 })}`} className="btn-outline">Next</Link> : <span />}
+          {page < totalPages ? <Link href={`/admin${qs({ page: page + 1 })}`} className="btn-outline">Next <ChevronRight className="size-4" aria-hidden /></Link> : <span />}
         </nav>
       )}
     </div>
   );
 }
 
+const KIND_ICON: Record<LeadKind, LucideIcon> = {
+  contact: Mail,
+  enquiry: MessageSquareText,
+  site_visit: CalendarCheck,
+};
+
 function LeadCard({ lead }: { lead: Lead }) {
+  const KindIcon = KIND_ICON[lead.kind];
   const digits = lead.phone.replace(/\D/g, "");
   const wa = `https://wa.me/${digits.length === 10 ? `91${digits}` : digits}`;
   const created = new Date(lead.created_at).toLocaleString("en-IN", {
@@ -145,39 +194,44 @@ function LeadCard({ lead }: { lead: Lead }) {
   });
 
   return (
-    <li className="rounded-2xl bg-white p-4 ring-1 ring-slate-200 sm:p-5">
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="min-w-0 space-y-2">
+    <li className="rounded-2xl bg-white p-5 ring-1 ring-slate-200 sm:p-7">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-8">
+        <div className="min-w-0 space-y-3">
           <div className="flex flex-wrap items-center gap-2">
-            <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_STYLE[lead.status]}`}>
+            <span className={`inline-flex h-7 items-center gap-1.5 rounded-full px-3 text-xs font-semibold ${STATUS_STYLE[lead.status]}`}>
+              <span className="size-1.5 rounded-full bg-current" aria-hidden />
               {LEAD_STATUS_LABELS[lead.status]}
             </span>
-            <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">
+            <span className="inline-flex h-7 items-center gap-1.5 rounded-full bg-slate-100 px-3 text-xs font-medium text-slate-700">
+              <KindIcon className="size-3.5" aria-hidden />
               {LEAD_KIND_LABELS[lead.kind]}
             </span>
-            <time dateTime={lead.created_at} className="text-xs text-slate-500">{created}</time>
+            <time dateTime={lead.created_at} className="inline-flex items-center gap-1.5 text-xs text-slate-500">
+              <Clock className="size-3.5" aria-hidden /> {created}
+            </time>
           </div>
-          <p className="text-lg font-semibold text-navy-900">{lead.name}</p>
+          <p className="font-display text-2xl leading-tight text-navy-900">{lead.name}</p>
           {lead.property_name && <p className="text-sm text-brand-700">{lead.property_name}</p>}
           {lead.preferred_date && (
             <p className="inline-flex items-center gap-1.5 text-sm text-violet-700">
               <CalendarDays className="size-4" aria-hidden /> Visit on {lead.preferred_date}
             </p>
           )}
-          {lead.message && <p className="text-sm whitespace-pre-line text-slate-700">{lead.message}</p>}
-          <div className="flex flex-wrap gap-2 pt-1">
-            <a href={telLink(lead.phone)} className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-sm hover:bg-slate-200">
+          {lead.message && <p className="rounded-xl bg-slate-50 px-4 py-3 leading-relaxed whitespace-pre-line text-slate-700">{lead.message}</p>}
+          <div className="flex flex-wrap gap-2 pt-2">
+            <a href={telLink(lead.phone)} className="inline-flex h-11 items-center gap-2 rounded-full bg-slate-100 px-4 text-sm font-medium hover:bg-slate-200">
               <Phone className="size-4" aria-hidden /> {lead.phone}
             </a>
-            <a href={wa} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1.5 text-sm text-green-800 hover:bg-green-100">
+            <a href={wa} target="_blank" rel="noopener noreferrer" className="inline-flex h-11 items-center gap-2 rounded-full bg-green-50 px-4 text-sm font-medium text-green-800 hover:bg-green-100">
               <WhatsAppIcon className="size-4" /> WhatsApp
             </a>
-            <a href={`mailto:${lead.email}`} className="inline-flex min-w-0 items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-sm hover:bg-slate-200">
+            <a href={`mailto:${lead.email}`} className="inline-flex h-11 min-w-0 items-center gap-2 rounded-full bg-slate-100 px-4 text-sm font-medium hover:bg-slate-200">
               <Mail className="size-4 shrink-0" aria-hidden /> <span className="truncate">{lead.email}</span>
             </a>
           </div>
           {(lead.source_path || lead.utm) && (
-            <p className="text-xs text-slate-400">
+            <p className="inline-flex items-center gap-1.5 text-xs text-slate-400">
+              <Link2 className="size-3.5 shrink-0" aria-hidden />
               From {lead.source_path ?? "unknown page"}
               {lead.utm && ` · ${Object.values(lead.utm).join(" / ")}`}
             </p>

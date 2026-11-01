@@ -19,7 +19,10 @@ export async function GET(request: NextRequest) {
   if (kind && LEAD_KINDS.includes(kind)) query = query.eq("kind", kind);
 
   const { data, error } = await query;
-  if (error) return new Response(error.message, { status: 500 });
+  if (error) {
+    console.error("[admin] leads export failed", error);
+    return new Response("Export failed: the database didn't respond. Go back and try again.", { status: 503, headers: { "Retry-After": "30" } });
+  }
 
   const columns = ["created_at", "kind", "status", "name", "phone", "email", "property_name", "preferred_date", "message", "notes", "source_path", "utm"];
   const date = new Date().toISOString().slice(0, 10);

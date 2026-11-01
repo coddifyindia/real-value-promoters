@@ -1,5 +1,6 @@
 import "server-only";
 import { createClient } from "@supabase/supabase-js";
+import { fetchWithTimeout } from "./fetch";
 import { supabasePublishableKey, supabaseUrl } from "./config";
 
 // Cookie-less client for public reads. Safe to use inside "use cache" scopes,
@@ -10,5 +11,6 @@ export function createPublicClient() {
   }
   return createClient(supabaseUrl, supabasePublishableKey, {
     auth: { persistSession: false, autoRefreshToken: false },
+    global: { fetch: fetchWithTimeout(8000) },
   });
 }

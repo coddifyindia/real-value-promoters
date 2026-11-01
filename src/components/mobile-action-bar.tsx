@@ -17,8 +17,9 @@ export function MobileActionBar() {
 }
 
 function ActionBarWithPath() {
-  // Property pages have their own enquiry form; send visitors there instead of /contact.
-  return <ActionBarView onProperty={usePathname().startsWith("/properties/")} />;
+  // Property and shortlist pages have their own enquiry form; send visitors there instead of /contact.
+  const path = usePathname();
+  return <ActionBarView onProperty={path.startsWith("/properties/") || path === "/shortlist"} />;
 }
 
 function ActionBarView({ onProperty }: { onProperty: boolean }) {

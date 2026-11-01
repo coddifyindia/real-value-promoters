@@ -4,10 +4,12 @@ import { Loader2 } from "lucide-react";
 import { useActionState } from "react";
 import { subscribe } from "@/app/actions/leads";
 import type { FormState } from "@/lib/validation";
-import { Honeypot, usePublicFormSubmit } from "./form-meta";
+import { Honeypot, usePublicFormSubmit, withNetworkFallback } from "./form-meta";
+
+const submit = withNetworkFallback(subscribe);
 
 export function NewsletterForm() {
-  const [state, action, pending] = useActionState(subscribe, { status: "idle" } as FormState);
+  const [state, action, pending] = useActionState(submit, { status: "idle" } as FormState);
   const onSubmit = usePublicFormSubmit(action);
 
   if (state.status === "success") {
@@ -33,7 +35,7 @@ export function NewsletterForm() {
           autoComplete="email"
           placeholder="Your email"
           aria-invalid={state.status === "error" || undefined}
-          className="min-h-11 w-full min-w-0 rounded-full border border-white/20 bg-white/10 px-4 text-base text-white placeholder:text-white/50 focus:border-gold-400 focus:outline-none sm:text-sm"
+          className="min-h-12 w-full min-w-0 rounded-full border border-white/20 bg-white/10 px-5 text-base text-white transition-colors placeholder:text-white/50 hover:border-white/35 focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20 focus:outline-none pointer-fine:text-[15px]"
         />
         <button type="submit" disabled={pending} className="btn-gold shrink-0">
           {pending ? <Loader2 className="size-4 animate-spin" aria-label="Subscribing" /> : "Subscribe"}

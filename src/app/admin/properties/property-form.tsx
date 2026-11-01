@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionSubmit } from "@/components/form-meta";
-import { ArrowLeft, ArrowRight, ImagePlus, Loader2, Star, Trash2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, CircleAlert, Contact, Eye, ExternalLink, ImagePlus, Images, Info, Link2, Loader2, type LucideIcon, Plus, Save, Star, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useActionState, useId, useRef, useState } from "react";
 import { saveProperty } from "@/app/actions/admin";
@@ -83,12 +83,12 @@ export function PropertyForm({ property }: { property?: Property }) {
     });
 
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
+    <form onSubmit={onSubmit} className="space-y-8">
       {property && <input type="hidden" name="id" value={property.id} />}
       <input type="hidden" name="images" value={JSON.stringify(images)} />
 
-      <section className="grid gap-4 rounded-2xl bg-white p-5 ring-1 ring-slate-200 sm:grid-cols-2">
-        <h2 className="text-lg sm:col-span-2">Basics</h2>
+      <section className="grid gap-x-6 gap-y-6 rounded-2xl bg-white p-6 ring-1 ring-slate-200 sm:grid-cols-2 sm:p-8">
+        <SectionTitle icon={Info} title="Basics" text="What buyers see first on the project card and page." />
         <div>
           <label htmlFor={`${id}-name`} className="label">Name</label>
           <input
@@ -100,13 +100,14 @@ export function PropertyForm({ property }: { property?: Property }) {
             }}
             required
             className="field"
+            placeholder="e.g. Real Value Diamond Avenue"
           />
           {errorFor("name")}
         </div>
         <div>
           <label htmlFor={`${id}-slug`} className="label">Web address</label>
-          <div className="flex items-center rounded-lg border border-slate-300 bg-slate-50 focus-within:border-brand-500">
-            <span className="pl-3 text-sm text-slate-500">/properties/</span>
+          <div className="flex min-h-12 items-center rounded-xl border border-slate-300 bg-slate-50 focus-within:border-brand-500 focus-within:ring-4 focus-within:ring-brand-500/15">
+            <span className="inline-flex items-center gap-1.5 pl-4 text-sm text-slate-500"><Link2 className="size-4" aria-hidden />/properties/</span>
             <input
               {...f("slug")}
               value={slug}
@@ -115,25 +116,26 @@ export function PropertyForm({ property }: { property?: Property }) {
                 setSlug(slugify(e.target.value));
               }}
               required
-              className="w-full min-w-0 bg-transparent px-1 py-2.5 text-base focus:outline-none sm:text-sm"
+              placeholder="diamond-avenue"
+              className="w-full min-w-0 bg-transparent px-1 py-3 text-base placeholder:text-slate-400 focus:outline-none pointer-fine:text-[15px]"
             />
           </div>
           {errorFor("slug")}
         </div>
         <div>
           <label htmlFor={`${id}-location`} className="label">Location / address</label>
-          <input {...f("location")} defaultValue={property?.location} required className="field" placeholder="Kalangal, near Sulur" />
+          <input {...f("location")} defaultValue={property?.location} required className="field" placeholder="e.g. Kalangal, near Sulur" />
           {errorFor("location")}
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor={`${id}-city`} className="label">City</label>
-            <input {...f("city")} defaultValue={property?.city} required className="field" placeholder="Coimbatore" />
+            <input {...f("city")} defaultValue={property?.city} required className="field" placeholder="e.g. Coimbatore" />
             {errorFor("city")}
           </div>
           <div>
             <label htmlFor={`${id}-type`} className="label">Type</label>
-            <select {...f("type")} defaultValue={property?.type ?? "plot"} className="field">
+            <select {...f("type")} defaultValue={property?.type ?? "plot"} className="field select-field">
               {PROPERTY_TYPES.map((t) => (
                 <option key={t} value={t}>{PROPERTY_TYPE_LABELS[t]}</option>
               ))}
@@ -142,67 +144,69 @@ export function PropertyForm({ property }: { property?: Property }) {
         </div>
         <div>
           <label htmlFor={`${id}-price_label`} className="label">Price shown on site</label>
-          <input {...f("price_label")} defaultValue={property?.price_label} required className="field" placeholder="₹7.75 Lakhs onwards" />
+          <input {...f("price_label")} defaultValue={property?.price_label} required className="field" placeholder="e.g. ₹7.75 Lakhs onwards" />
           {errorFor("price_label")}
         </div>
         <div>
           <label htmlFor={`${id}-price_from`} className="label">
-            Starting price in ₹ <span className="font-normal text-slate-400">(for sorting; blank if per sq.ft)</span>
+            Starting price in ₹ <span className="font-normal text-slate-500">(for sorting; blank if per sq.ft)</span>
           </label>
-          <input {...f("price_from")} defaultValue={property?.price_from ?? ""} inputMode="numeric" className="field" placeholder="775000" />
+          <input {...f("price_from")} defaultValue={property?.price_from ?? ""} inputMode="numeric" className="field" placeholder="e.g. 775000" />
           {errorFor("price_from")}
         </div>
         <div className="sm:col-span-2">
           <label htmlFor={`${id}-description`} className="label">Description</label>
-          <textarea {...f("description")} defaultValue={property?.description} rows={5} className="field" />
+          <textarea {...f("description")} defaultValue={property?.description} rows={5} className="field" placeholder="A short paragraph about the project: where it is, what is nearby, plot sizes and approvals." />
           {errorFor("description")}
         </div>
         <div className="sm:col-span-2">
           <label htmlFor={`${id}-amenities`} className="label">
-            Amenities <span className="font-normal text-slate-400">(one per line)</span>
+            Amenities <span className="font-normal text-slate-500">(one per line)</span>
           </label>
           <textarea {...f("amenities")} defaultValue={property?.amenities.join("\n")} rows={6} className="field" placeholder={"Gated Community\nCCTV\nChildren's Park"} />
           {errorFor("amenities")}
         </div>
       </section>
 
-      <section className="space-y-4 rounded-2xl bg-white p-5 ring-1 ring-slate-200">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="text-lg">Photos</h2>
-            <p className="text-sm text-slate-500">The first photo is the cover. Use the arrows to reorder.</p>
-          </div>
+      <section className="space-y-6 rounded-2xl bg-white p-6 ring-1 ring-slate-200 sm:p-8">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <SectionTitle icon={Images} title="Photos" text="The first photo is the cover. Use the arrows to reorder." />
           <button type="button" onClick={() => fileInput.current?.click()} disabled={uploading > 0} className="btn-outline">
             {uploading > 0 ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <ImagePlus className="size-4" aria-hidden />}
             {uploading > 0 ? `Uploading ${uploading}…` : "Add photos"}
           </button>
           <input ref={fileInput} type="file" accept="image/*" multiple hidden onChange={(e) => upload(e.target.files)} />
         </div>
-        {uploadError && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700" role="alert">{uploadError}</p>}
+        {uploadError && (
+          <p className="flex gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-700" role="alert">
+            <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
+            {uploadError}
+          </p>
+        )}
         {errorFor("images")}
         {images.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500">No photos yet.</p>
+          <p className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-slate-300 px-6 py-12 text-center text-slate-500"><ImagePlus className="size-8 text-slate-400" aria-hidden /><span>No photos yet. Click <strong>Add photos</strong> to upload from your computer or phone.</span></p>
         ) : (
-          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          <ul className="grid grid-cols-1 gap-4 min-[420px]:grid-cols-2 sm:grid-cols-3 xl:grid-cols-4">
             {images.map((src, i) => (
               <li key={src} className="overflow-hidden rounded-xl ring-1 ring-slate-200">
                 <div className="relative aspect-[4/3] bg-slate-100">
                   <Image src={src} alt={`Photo ${i + 1}`} fill sizes="200px" className="object-cover" />
                   {i === 0 && (
-                    <span className="absolute top-2 left-2 rounded-full bg-gold-400 px-2 py-0.5 text-xs font-semibold text-navy-950">Cover</span>
+                    <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-gold-400 px-2 py-0.5 text-xs font-semibold text-navy-950"><Star className="size-3 fill-current" aria-hidden /> Cover</span>
                   )}
                 </div>
-                <div className="flex items-center justify-between bg-white p-1">
-                  <button type="button" onClick={() => move(i, -1)} disabled={i === 0} className="inline-flex size-9 items-center justify-center rounded-lg hover:bg-slate-100 disabled:opacity-30" aria-label="Move earlier">
+                <div className="grid grid-cols-4 gap-1 bg-white p-1">
+                  <button type="button" onClick={() => move(i, -1)} disabled={i === 0} className="inline-flex h-11 items-center justify-center rounded-lg hover:bg-slate-100 disabled:opacity-30" aria-label="Move earlier" title="Move earlier">
                     <ArrowLeft className="size-4" />
                   </button>
-                  <button type="button" onClick={() => setImages((p) => [src, ...p.filter((x) => x !== src)])} disabled={i === 0} className="inline-flex size-9 items-center justify-center rounded-lg hover:bg-slate-100 disabled:opacity-30" aria-label="Make cover">
+                  <button type="button" onClick={() => setImages((p) => [src, ...p.filter((x) => x !== src)])} disabled={i === 0} className="inline-flex h-11 items-center justify-center rounded-lg hover:bg-slate-100 disabled:opacity-30" aria-label="Make cover" title="Make cover">
                     <Star className="size-4" />
                   </button>
-                  <button type="button" onClick={() => setImages((p) => p.filter((x) => x !== src))} className="inline-flex size-9 items-center justify-center rounded-lg text-red-600 hover:bg-red-50" aria-label="Remove photo">
+                  <button type="button" onClick={() => setImages((p) => p.filter((x) => x !== src))} className="inline-flex h-11 items-center justify-center rounded-lg text-red-600 hover:bg-red-50" aria-label="Remove photo" title="Remove photo">
                     <Trash2 className="size-4" />
                   </button>
-                  <button type="button" onClick={() => move(i, 1)} disabled={i === images.length - 1} className="inline-flex size-9 items-center justify-center rounded-lg hover:bg-slate-100 disabled:opacity-30" aria-label="Move later">
+                  <button type="button" onClick={() => move(i, 1)} disabled={i === images.length - 1} className="inline-flex h-11 items-center justify-center rounded-lg hover:bg-slate-100 disabled:opacity-30" aria-label="Move later" title="Move later">
                     <ArrowRight className="size-4" />
                   </button>
                 </div>
@@ -212,17 +216,17 @@ export function PropertyForm({ property }: { property?: Property }) {
         )}
       </section>
 
-      <section className="grid gap-4 rounded-2xl bg-white p-5 ring-1 ring-slate-200 sm:grid-cols-2">
-        <h2 className="text-lg sm:col-span-2">Contact &amp; media</h2>
+      <section className="grid gap-x-6 gap-y-6 rounded-2xl bg-white p-6 ring-1 ring-slate-200 sm:grid-cols-2 sm:p-8">
+        <SectionTitle icon={Contact} title="Contact & media" text="Who buyers can call about this project, plus optional video and map links." />
         <div>
           <label htmlFor={`${id}-contact_name`} className="label">Project manager</label>
-          <input {...f("contact_name")} defaultValue={property?.contact_name ?? ""} className="field" />
+          <input {...f("contact_name")} defaultValue={property?.contact_name ?? ""} className="field" placeholder="e.g. Mr. Ramesh" />
         </div>
         <div>
           <label htmlFor={`${id}-contact_phones`} className="label">
-            Phone numbers <span className="font-normal text-slate-400">(comma separated)</span>
+            Phone numbers <span className="font-normal text-slate-500">(comma separated)</span>
           </label>
-          <input {...f("contact_phones")} defaultValue={property?.contact_phones.join(", ")} className="field" placeholder="9043934675, 9655669675" />
+          <input {...f("contact_phones")} defaultValue={property?.contact_phones.join(", ")} className="field" placeholder="e.g. 9043934675, 9655669675" />
           {errorFor("contact_phones")}
         </div>
         <div>
@@ -237,40 +241,84 @@ export function PropertyForm({ property }: { property?: Property }) {
         </div>
         <div className="sm:col-span-2">
           <label htmlFor={`${id}-map_embed_url`} className="label">
-            Google Maps embed link <span className="font-normal text-slate-400">(Maps → Share → Embed a map → copy the src=&quot;…&quot; URL)</span>
+            Google Maps embed link <span className="font-normal text-slate-500">(Maps → Share → Embed a map → copy the src=&quot;…&quot; URL)</span>
           </label>
           <input {...f("map_embed_url")} defaultValue={property?.map_embed_url ?? ""} className="field" placeholder="https://www.google.com/maps/embed?pb=…" />
           {errorFor("map_embed_url")}
         </div>
       </section>
 
-      <section className="flex flex-wrap items-center gap-6 rounded-2xl bg-white p-5 ring-1 ring-slate-200">
-        <label className="inline-flex items-center gap-2 text-sm font-medium">
-          <input type="checkbox" name="published" defaultChecked={property?.published ?? true} className="size-4 accent-brand-600" />
-          Published (visible on website)
+      <section className="grid gap-6 rounded-2xl bg-white p-6 ring-1 ring-slate-200 sm:grid-cols-3 sm:p-8">
+        <SectionTitle icon={Eye} title="Visibility" text="Control where this project appears." className="sm:col-span-3" />
+        <label className="flex min-h-12 cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4 hover:border-slate-300">
+          <input type="checkbox" name="published" defaultChecked={property?.published ?? true} className="mt-0.5 size-5 accent-brand-600" />
+          <span>
+            <span className="block font-semibold text-navy-900">Published</span>
+            <span className="text-sm text-slate-500">Visible on the website</span>
+          </span>
         </label>
-        <label className="inline-flex items-center gap-2 text-sm font-medium">
-          <input type="checkbox" name="featured" defaultChecked={property?.featured ?? false} className="size-4 accent-brand-600" />
-          Featured on home page
+        <label className="flex min-h-12 cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4 hover:border-slate-300">
+          <input type="checkbox" name="featured" defaultChecked={property?.featured ?? false} className="mt-0.5 size-5 accent-brand-600" />
+          <span>
+            <span className="block font-semibold text-navy-900">Featured</span>
+            <span className="text-sm text-slate-500">Shown in the home page gallery</span>
+          </span>
         </label>
-        <label className="inline-flex items-center gap-2 text-sm font-medium">
-          Display order
-          <input name="sort_order" type="number" defaultValue={property?.sort_order ?? 100} className="field w-24" />
+        <label className="block">
+          <span className="label">Display order</span>
+          <input name="sort_order" type="number" defaultValue={property?.sort_order ?? 100} className="field" placeholder="e.g. 10" />
+          <span className="mt-1.5 block text-sm text-slate-500">Lower numbers appear first.</span>
         </label>
       </section>
 
-      <div className="sticky bottom-0 -mx-4 flex items-center gap-4 border-t border-slate-200 bg-slate-50/95 px-4 py-3 backdrop-blur sm:mx-0 sm:rounded-2xl sm:border">
-        <button type="submit" disabled={pending || uploading > 0} className="btn-primary">
-          {pending && <Loader2 className="size-4 animate-spin" aria-hidden />}
-          {property ? "Save changes" : "Create property"}
-        </button>
+      {/* Actions: plain buttons at the end of the form, no extra panel around them. */}
+      <div className="flex flex-col-reverse items-stretch gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-end">
         {state.message && (
-          <p className={`text-sm ${state.status === "error" ? "text-red-600" : "text-green-700"}`} role="status">
+          <p className={`text-sm sm:mr-auto ${state.status === "error" ? "text-red-600" : "text-green-700"}`} role="status">
             {state.message}
           </p>
         )}
+        {property?.published && (
+          <a href={`/properties/${property.slug}`} target="_blank" rel="noopener" className="btn-outline btn-lg">
+            <ExternalLink className="size-4" aria-hidden /> Preview on site
+          </a>
+        )}
+        <button type="submit" disabled={pending || uploading > 0} className="btn-primary btn-lg min-w-48">
+          {pending ? (
+            <Loader2 className="size-5 animate-spin" aria-hidden />
+          ) : property ? (
+            <Save className="size-5" aria-hidden />
+          ) : (
+            <Plus className="size-5" aria-hidden />
+          )}
+          {property ? "Save changes" : "Create property"}
+        </button>
       </div>
     </form>
+  );
+}
+
+function SectionTitle({
+  icon: Icon,
+  title,
+  text,
+  className = "sm:col-span-2",
+}: {
+  icon: LucideIcon;
+  title: string;
+  text: string;
+  className?: string;
+}) {
+  return (
+    <div className={`flex items-start gap-4 ${className}`}>
+      <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-gold-100 text-gold-700">
+        <Icon className="size-5" aria-hidden />
+      </span>
+      <div>
+        <h2 className="text-xl">{title}</h2>
+        <p className="mt-0.5 text-sm text-slate-500">{text}</p>
+      </div>
+    </div>
   );
 }
 
@@ -281,9 +329,9 @@ export function DeletePropertyButton() {
       onClick={(e) => {
         if (!confirm("Delete this property permanently? This cannot be undone.")) e.preventDefault();
       }}
-      className="btn mt-3 border border-red-300 bg-white text-red-700 hover:bg-red-100"
+      className="btn mt-4 border border-red-300 bg-white text-red-700 hover:bg-red-100"
     >
-      Delete property
+      <Trash2 className="size-4" aria-hidden /> Delete property
     </button>
   );
 }

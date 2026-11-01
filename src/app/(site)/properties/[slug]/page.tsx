@@ -1,13 +1,17 @@
-import { CheckCircle2, ChevronRight, MapPin, Phone } from "lucide-react";
+import { ChevronRight, MapPin, Phone } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { amenityIcon } from "@/lib/amenity-icon";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, ViewTransition } from "react";
+import { EmiCalculator } from "@/components/emi-calculator";
 import { Gallery } from "@/components/gallery";
 import { InstagramIcon, WhatsAppIcon } from "@/components/icons";
 import { JsonLd } from "@/components/json-ld";
 import { LeadForm } from "@/components/lead-form";
 import { PropertyGrid } from "@/components/property-card";
+import { ShortlistButton } from "@/components/shortlist-button";
+import { PropertySkeleton } from "@/components/skeletons";
 import { YouTubeEmbed } from "@/components/youtube-embed";
 import { getPropertyBySlug, getPublishedProperties } from "@/lib/properties";
 import { site, telLink, whatsappLink } from "@/lib/site";
@@ -35,8 +39,19 @@ export async function generateMetadata({ params }: PageProps<"/properties/[slug]
 
 export default function PropertyPage({ params }: PageProps<"/properties/[slug]">) {
   return (
-    <Suspense fallback={<PropertySkeleton />}>
-      <PropertyDetails params={params} />
+    // The skeleton slides away and the real page slides up when it arrives
+    // (React <ViewTransition>, see globals.css). Rendered per request, so
+    // admin edits are visible on the very next visit.
+    <Suspense
+      fallback={
+        <ViewTransition exit="slide-down" default="none">
+          <PropertySkeleton />
+        </ViewTransition>
+      }
+    >
+      <ViewTransition enter="slide-up" default="none">
+        <PropertyDetails params={params} />
+      </ViewTransition>
     </Suspense>
   );
 }
@@ -88,15 +103,18 @@ async function PropertyDetails({ params }: Pick<PageProps<"/properties/[slug]">,
               <MapPin className="mt-1 size-4 shrink-0" aria-hidden /> {property.location}
             </p>
           </div>
-          <div className="lg:text-right">
-            <p className="text-sm text-slate-500">Starting from</p>
-            <p className="font-display text-3xl text-brand-700">{property.price_label}</p>
+          <div className="flex flex-wrap items-end justify-between gap-4 lg:flex-col lg:items-end">
+            <div className="lg:text-right">
+              <p className="text-sm text-slate-500">Starting from</p>
+              <p className="font-display text-3xl text-brand-700">{property.price_label}</p>
+            </div>
+            <ShortlistButton slug={property.slug} name={property.name} variant="inline" />
           </div>
         </header>
 
         <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_380px]">
           <div className="min-w-0 space-y-12">
-            <Gallery images={property.images} name={property.name} />
+            <Gallery images={property.images} name={property.name} slug={property.slug} />
 
             <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-slate-200 ring-1 ring-slate-200 sm:grid-cols-4">
               {facts.map(([k, v]) => (
@@ -115,16 +133,26 @@ async function PropertyDetails({ params }: Pick<PageProps<"/properties/[slug]">,
             {property.amenities.length > 0 && (
               <section>
                 <h2 className="text-2xl">Features &amp; amenities</h2>
-                <ul className="mt-5 grid gap-3 sm:grid-cols-2">
-                  {property.amenities.map((a) => (
-                    <li key={a} className="flex items-start gap-3 rounded-xl bg-white p-3.5 ring-1 ring-slate-200">
-                      <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-green-600" aria-hidden />
-                      <span className="text-sm text-slate-700">{a}</span>
-                    </li>
-                  ))}
+                <ul className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+                  {property.amenities.map((a) => {
+                    const Icon = amenityIcon(a);
+                    return (
+                      <li
+                        key={a}
+                        className="reveal flex flex-col items-center justify-center gap-3 rounded-2xl bg-white px-3 py-6 text-center ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-card"
+                      >
+                        <span className="inline-flex size-14 items-center justify-center rounded-2xl bg-gold-100 text-gold-700">
+                          <Icon className="size-7" strokeWidth={1.6} aria-hidden />
+                        </span>
+                        <span className="text-[15px] leading-snug font-medium text-navy-900">{a}</span>
+                      </li>
+                    );
+                  })}
                 </ul>
               </section>
             )}
+
+            {property.price_from ? <EmiCalculator price={property.price_from} propertyName={property.name} /> : null}
 
             {property.youtube_id && (
               <section>
@@ -232,17 +260,4 @@ function listingJsonLd(p: Property) {
       },
     ],
   };
-}
-
-function PropertySkeleton() {
-  return (
-    <div className="container-x animate-pulse pt-8 pb-16" aria-busy="true" aria-label="Loading property">
-      <div className="h-4 w-48 rounded bg-slate-200" />
-      <div className="mt-6 h-10 w-2/3 rounded bg-slate-200" />
-      <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_380px]">
-        <div className="aspect-[16/10] rounded-2xl bg-slate-200" />
-        <div className="h-96 rounded-2xl bg-slate-200" />
-      </div>
-    </div>
-  );
 }

@@ -1,13 +1,13 @@
 "use server";
 
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { headers } from "next/headers";
 import { after } from "next/server";
 import { sendLeadEmails } from "@/lib/email";
 import { getPropertyBySlug } from "@/lib/properties";
 import { site, whatsappLink } from "@/lib/site";
 import { createServiceClient } from "@/lib/supabase/service";
-import { fieldErrorsOf, leadSchema, subscribeSchema, type FormState } from "@/lib/validation";
+import { fieldErrorsOf, leadSchema, subscribeSchema, type FormState, type LeadInput } from "@/lib/validation";
 
 const RATE_LIMIT = { max: 5, windowMinutes: 10 };
 const MIN_FILL_MS = 2500;
@@ -52,7 +52,8 @@ export async function submitLead(_prev: FormState, formData: FormData): Promise<
   }
   const input = parsed.data;
 
-  const property = input.propertySlug ? await getPropertyBySlug(input.propertySlug) : null;
+  // The catalogue lookup only adds context; a hiccup there must not lose the lead.
+  const property = input.propertySlug ? await getPropertyBySlug(input.propertySlug).catch(() => null) : null;
   const waText = property
     ? `Hi, I'm ${input.name}. I just enquired about ${property.name} on your website.`
     : `Hi, I'm ${input.name}. I just sent an enquiry on your website.`;
@@ -62,15 +63,61 @@ export async function submitLead(_prev: FormState, formData: FormData): Promise<
     return { status: "success", whatsappUrl: whatsappLink(waText) };
   }
 
+  try {
+    const result = await saveLead(input, formData, property, waText);
+    if (result !== DB_FAILED) return result;
+  } catch (err) {
+    // Database down, timeout, misconfiguration: never surface a 500 to a buyer.
+    console.error("[leads] unexpected failure", err);
+  }
+
+  // The database couldn't take the lead. Email it straight to the team so it
+  // isn't lost; only if that fails too does the visitor see an error.
+  const emailed = await sendLeadEmails({ ...emailFields(input, property), id: `unsaved-${randomUUID()}`, unsaved: true }).catch(
+    () => false,
+  );
+  if (emailed) return { status: "success", whatsappUrl: whatsappLink(waText) };
+  return {
+    status: "error",
+    message: `Sorry, we couldn't send that just now. Please call us on ${site.phone.display} or message us on WhatsApp.`,
+    whatsappUrl: whatsappLink(waText),
+  };
+}
+
+const DB_FAILED = Symbol("db-failed");
+
+function emailFields(input: LeadInput, property: Awaited<ReturnType<typeof getPropertyBySlug>>) {
+  return {
+    kind: input.kind,
+    name: input.name,
+    email: input.email,
+    phone: input.phone,
+    message: input.message,
+    propertyName: property?.name ?? null,
+    propertyUrl: property ? `${site.url}/properties/${property.slug}` : null,
+    preferredDate: input.preferredDate,
+  };
+}
+
+async function saveLead(
+  input: LeadInput,
+  formData: FormData,
+  property: Awaited<ReturnType<typeof getPropertyBySlug>>,
+  waText: string,
+): Promise<FormState | typeof DB_FAILED> {
   const supabase = createServiceClient();
   const { ipHash, userAgent } = await requestInfo();
 
   const since = new Date(Date.now() - RATE_LIMIT.windowMinutes * 60_000).toISOString();
-  const { count } = await supabase
+  const { count, error: countError } = await supabase
     .from("leads")
     .select("id", { count: "exact", head: true })
     .eq("ip_hash", ipHash)
     .gte("created_at", since);
+  if (countError) {
+    console.error("[leads] rate-limit check failed", countError);
+    return DB_FAILED;
+  }
   if ((count ?? 0) >= RATE_LIMIT.max) {
     return {
       status: "error",
@@ -99,27 +146,11 @@ export async function submitLead(_prev: FormState, formData: FormData): Promise<
 
   if (error || !lead) {
     console.error("[leads] insert failed", error);
-    return {
-      status: "error",
-      message: `Sorry, something went wrong. Please call us on ${site.phone.display} or try WhatsApp.`,
-      whatsappUrl: whatsappLink(waText),
-    };
+    return DB_FAILED;
   }
 
   // The lead is safely stored; send emails after the response so the visitor isn't kept waiting.
-  after(() =>
-    sendLeadEmails({
-      id: lead.id,
-      kind: input.kind,
-      name: input.name,
-      email: input.email,
-      phone: input.phone,
-      message: input.message,
-      propertyName: property?.name ?? null,
-      propertyUrl: property ? `${site.url}/properties/${property.slug}` : null,
-      preferredDate: input.preferredDate,
-    }),
-  );
+  after(() => sendLeadEmails({ ...emailFields(input, property), id: lead.id }));
 
   return { status: "success", whatsappUrl: whatsappLink(waText) };
 }
@@ -131,14 +162,40 @@ export async function subscribe(_prev: FormState, formData: FormData): Promise<F
   }
   if (looksAutomated(formData)) return { status: "success" };
 
-  const { error } = await createServiceClient()
-    .from("subscribers")
-    .insert({ email: parsed.data.email.toLowerCase(), source_path: String(formData.get("sourcePath") ?? "") || null });
+  try {
+    const supabase = createServiceClient();
+    const { ipHash } = await requestInfo();
 
-  // 23505 = already subscribed; treat as success.
-  if (error && error.code !== "23505") {
-    console.error("[subscribe] insert failed", error);
+    // Same per-connection limit as enquiries, so the list can't be flooded.
+    const since = new Date(Date.now() - RATE_LIMIT.windowMinutes * 60_000).toISOString();
+    const { count } = await supabase
+      .from("subscribers")
+      .select("id", { count: "exact", head: true })
+      .eq("ip_hash", ipHash)
+      .gte("created_at", since);
+    if ((count ?? 0) >= RATE_LIMIT.max) {
+      return { status: "error", message: "Too many sign-ups from this connection. Please try again later." };
+    }
+
+    const row = {
+      email: parsed.data.email.toLowerCase(),
+      source_path: String(formData.get("sourcePath") ?? "").slice(0, 300) || null,
+    };
+    let { error } = await supabase.from("subscribers").insert({ ...row, ip_hash: ipHash });
+    // Databases set up before migration 20261031 have no ip_hash column yet:
+    // still record the sign-up rather than lose it.
+    if (error && (error.code === "PGRST204" || error.code === "42703")) {
+      ({ error } = await supabase.from("subscribers").insert(row));
+    }
+
+    // 23505 = already subscribed; treat as success (and don't reveal who is on the list).
+    if (error && error.code !== "23505") {
+      console.error("[subscribe] insert failed", error);
+      return { status: "error", message: "Couldn't subscribe right now. Please try again later." };
+    }
+    return { status: "success", message: "You're subscribed. We'll email you about new launches." };
+  } catch (err) {
+    console.error("[subscribe] unexpected failure", err);
     return { status: "error", message: "Couldn't subscribe right now. Please try again later." };
   }
-  return { status: "success", message: "You're subscribed. We'll email you about new launches." };
 }

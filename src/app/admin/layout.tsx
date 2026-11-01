@@ -11,10 +11,10 @@ export default function AdminLayout({ children }: LayoutProps<"/admin">) {
   return (
     <div className="flex min-h-dvh flex-col bg-slate-50">
       {/* The nav reads the URL, which isn't known while prerendering dynamic admin routes. */}
-      <Suspense fallback={<div className="h-14 border-b border-slate-200 bg-white" />}>
+      <Suspense fallback={<div className="h-16 border-b border-slate-200 bg-white" />}>
         <AdminNav />
       </Suspense>
-      <main className="container-x flex-1 py-6 sm:py-8">{children}</main>
+      <main className="container-x flex-1 py-8 sm:py-12">{children}</main>
     </div>
   );
 }
