@@ -36,3 +36,16 @@ A summary of the premium upgrade, written for the Real Value Promoters team.
 | **Errors** | Designed error and 404 pages, always with a way to reach the team. If the database goes down, pages stay up from cache and enquiries are emailed to the team instead of being lost. A dropped connection keeps the visitor's typing. |
 | **Loading** | Shimmer placeholders shaped like the real content (no jumping layout). The menu link and the tapped project card show progress immediately. |
 | **Security** | Strict browser security policy (CSP, HSTS and more), locked-down admin, allowlisted admin links, newsletter rate limiting, and a published security contact. |
+
+## Round 3: award-style experience
+
+Modelled on this year's Awwwards real-estate winners (ERA Residence, Belgrade Arbor, Sobha Privy, Likova).
+
+| Area | What changed |
+| --- | --- |
+| **3D hero** | A live 3D model of a gated layout (plots, roads, park, avenue trees, compound wall, entrance arch) in golden-hour light. On desktop, scrolling tells a three-part story: the layout, available plots lifting and glowing gold, then villas rising. Phones get a lighter version that plays on its own. It loads after the page is usable, pauses when off screen, and visitors who prefer reduced motion see the photo hero instead. |
+| **Projects** | A pinned horizontal gallery: scrolling down slides the projects sideways, with large photos and numbering. On phones it's a swipeable row. |
+| **Cities** | A large-type index. With a mouse, a photo of each city's projects follows the cursor. |
+| **Editorial layout** | "Why us" and reviews are set as typography rather than icon cards, and the footer ends with a giant "Real Value" wordmark. |
+| **Feel** | Smooth inertial scrolling and a cursor that labels what you're about to open (mouse only), a short intro reveal on the first visit, and a subtle film grain. |
+| **Speed** | First load is unchanged: LCP 0.6s on desktop, 0.8s on a throttled phone, with no layout shift. |
