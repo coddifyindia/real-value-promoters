@@ -8,6 +8,7 @@ import { deleteProperty } from "@/app/actions/admin";
 import { requireAdmin } from "@/lib/auth";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import type { Property } from "@/lib/types";
+import { PageHeader } from "../../page-header";
 import { SetupNotice } from "../../setup-notice";
 import { DeletePropertyButton, PropertyForm } from "../property-form";
 
@@ -30,8 +31,8 @@ async function Editor({ params }: Pick<PageProps<"/admin/properties/[id]">, "par
 
   if (id === "new") {
     return (
-      <div className="space-y-6">
-        <h1 className="text-3xl">Add property</h1>
+      <div className="space-y-8">
+        <PageHeader title="Add property" description="Fill in the details below. You can save it hidden and publish later." />
         <PropertyForm />
       </div>
     );
@@ -43,20 +44,19 @@ async function Editor({ params }: Pick<PageProps<"/admin/properties/[id]">, "par
   const property = data as Property;
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <Link href="/admin/properties" className="text-sm text-slate-500 hover:text-navy-900">← All properties</Link>
-          <h1 className="mt-1 text-3xl">{property.name}</h1>
-        </div>
-        {property.published && (
-          <Link href={`/properties/${property.slug}`} target="_blank" className="btn-outline">
-            <ExternalLink className="size-4" aria-hidden /> View on site
-          </Link>
-        )}
+    <div className="space-y-8">
+      <div>
+        <Link href="/admin/properties" className="inline-flex h-10 items-center text-sm text-slate-500 hover:text-navy-900">← All properties</Link>
+        <PageHeader title={property.name} description="Changes go live on the website as soon as you save.">
+          {property.published && (
+            <Link href={`/properties/${property.slug}`} target="_blank" className="btn-outline">
+              <ExternalLink className="size-4" aria-hidden /> View on site
+            </Link>
+          )}
+        </PageHeader>
       </div>
       <PropertyForm property={property} />
-      <form action={deleteProperty} className="rounded-2xl border border-red-200 bg-red-50 p-4">
+      <form action={deleteProperty} className="rounded-2xl border border-red-200 bg-red-50 p-6 sm:p-8">
         <input type="hidden" name="id" value={property.id} />
         <p className="text-sm text-red-800">
           Deleting removes this property from the website permanently. Leads that mention it are kept. To hide it

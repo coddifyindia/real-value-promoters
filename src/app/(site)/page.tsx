@@ -315,20 +315,18 @@ export default async function HomePage() {
       <section className="bg-sand-50 py-20 sm:py-32">
         <div className="container-x">
           <p className="eyebrow">Why Real Value</p>
-          <p className="mt-4 max-w-5xl font-display text-3xl leading-[1.15] text-navy-900 sm:text-5xl lg:text-6xl">
+          <p className="mt-4 max-w-5xl font-display text-3xl leading-[1.2] text-navy-900 sm:text-5xl sm:leading-[1.15] lg:text-6xl">
             <SplitText text="We sell land the way we'd want to buy it:" />{" "}
             <SplitText text="approved, documented and explained." wordClassName="text-gold-600 italic" delay={8} />
           </p>
-          <ol className="mt-16 grid gap-x-16 sm:mt-24 md:grid-cols-2 lg:grid-cols-3">
+          <ol className="mt-16 grid gap-x-12 sm:mt-20 md:grid-cols-2 lg:grid-cols-3 lg:gap-x-16">
             {reasons.map(({ title, text }, i) => (
-              <li key={title} className="reveal group border-t border-navy-900/15 py-8">
-                <div className="flex items-baseline gap-5">
-                  <span className="font-display text-sm text-gold-700 italic">{String(i + 1).padStart(2, "0")}</span>
-                  <div>
-                    <h3 className="text-2xl transition-colors group-hover:text-brand-700">{title}</h3>
-                    <p className="mt-3 leading-relaxed text-slate-600">{text}</p>
-                  </div>
-                </div>
+              <li key={title} className="reveal group border-t border-navy-900/15 pt-6 pb-10">
+                <span className="block font-display text-5xl leading-none text-gold-600 tabular-nums transition-colors group-hover:text-gold-500">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h3 className="mt-6 text-2xl leading-snug transition-colors group-hover:text-brand-700">{title}</h3>
+                <p className="mt-3 max-w-sm text-[17px] leading-relaxed text-slate-600">{text}</p>
               </li>
             ))}
           </ol>
@@ -363,7 +361,7 @@ export default async function HomePage() {
                 style={{ top: `calc(8rem + ${i * 1.75}rem)` }}
               >
                 <div className="flex items-start justify-between gap-6">
-                  <span className="font-display text-5xl text-gold-400 sm:text-6xl">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="font-display text-5xl leading-none text-gold-400 tabular-nums sm:text-6xl">{String(i + 1).padStart(2, "0")}</span>
                   <span className="mt-2 text-xs tracking-[0.2em] text-white/60 uppercase">
                     Step {i + 1} of {steps.length}
                   </span>
@@ -377,9 +375,9 @@ export default async function HomePage() {
       </section>
 
       {/* Big type band */}
-      <section aria-label="What we offer" className="overflow-hidden bg-sand-50 pt-10 pb-2 sm:pt-16 sm:pb-4">
+      <section aria-label="What we offer" className="overflow-hidden border-b border-navy-900/10 bg-sand-50 py-8 sm:py-12">
         <div className="marquee [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
-          <div className="marquee-track flex w-max items-center gap-10 font-display text-6xl leading-none whitespace-nowrap text-navy-900 sm:text-8xl">
+          <div className="marquee-track flex w-max items-center gap-10 font-display text-6xl leading-[1.2] whitespace-nowrap text-navy-900 sm:text-8xl sm:leading-[1.2]">
             {[0, 1].map((copy) =>
               bandWords.map((w, i) => (
                 <span key={`${copy}-${w}`} aria-hidden={copy === 1} className="flex items-center gap-10">
@@ -393,7 +391,7 @@ export default async function HomePage() {
       </section>
 
       {/* Testimonials + partners */}
-      <section className="py-16 sm:py-24">
+      <section className="py-14 sm:py-20">
         <div className="container-x">
           <SectionHeading eyebrow="Happy families" title="What our buyers say" />
           <div className="mt-14 grid gap-x-12 gap-y-4 md:grid-cols-3">
@@ -440,25 +438,32 @@ export default async function HomePage() {
 
       {/* CTA */}
       <section className="bg-white py-16 sm:py-24" id="enquire">
-        <div className="container-x grid items-start gap-10 lg:grid-cols-2">
-          <div>
+        {/* The photo column stretches to the form's height, so both columns end on one line. */}
+        <div className="container-x grid gap-10 lg:grid-cols-2 lg:gap-14">
+          <div className="flex flex-col">
             <SectionHeading
               align="left"
               eyebrow="Talk to us"
               title="Book a free site visit"
               description="Share a few details and our team will call you within one working day with options that fit your budget. Pickup is on us."
             />
-            <div data-reveal="clip" className="relative mt-8 hidden aspect-[4/3] overflow-hidden rounded-2xl lg:block">
+            <div data-reveal="clip" className="relative mt-8 hidden min-h-72 flex-1 overflow-hidden rounded-3xl lg:block">
               <Image
                 src="/images/properties/golden-farms/01.webp"
                 alt="Aerial view of Real Value Golden Farms near Pollachi"
                 fill
-                sizes="600px"
+                sizes="(min-width: 1280px) 600px, 50vw"
                 className="object-cover"
               />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-navy-950/80 to-transparent p-6 pt-16 text-white">
+                <p className="font-display text-xl">Golden Farms, Pollachi</p>
+                <p className="mt-1 text-sm text-white/75">Free pickup and drop for every site visit</p>
+              </div>
             </div>
           </div>
-          <div className="rounded-2xl bg-sand-50 p-6 ring-1 ring-slate-200 sm:p-8">
+          <div className="rounded-3xl bg-sand-50 p-6 ring-1 ring-slate-200 sm:p-10">
+            <h3 className="text-2xl">Tell us what you&apos;re looking for</h3>
+            <p className="mt-1 mb-7 text-sm text-slate-600">Takes under a minute. No spam, ever.</p>
             <LeadForm defaultKind="contact" />
           </div>
         </div>

@@ -35,7 +35,7 @@ export function ProjectGallery({ properties, total }: { properties: Property[]; 
         <div className="gallery-viewport mt-10 sm:mt-14">
           <ul className="gallery-track flex w-max gap-5 px-4 sm:gap-8 sm:px-6 lg:px-[max(2rem,calc((100vw-80rem)/2+2rem))]">
             {properties.map((p, i) => (
-              <li key={p.id} className="gallery-panel group relative w-[82vw] shrink-0 snap-start sm:w-[54vw] lg:w-[min(34vw,520px)]" data-cursor="View">
+              <li key={p.id} className="gallery-panel group relative w-[82vw] shrink-0 snap-start sm:w-[54vw] lg:w-[min(34vw,520px)]" data-cursor="View project">
                 <div className="relative aspect-[4/5] overflow-hidden rounded-[1.75rem] bg-navy-900">
                   {p.images[0] && (
                     <Image

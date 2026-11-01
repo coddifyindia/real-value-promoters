@@ -2,6 +2,7 @@ import { Mail, MapPin, Phone } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "../../public/images/brand/logo.png";
+import { ConstructionWordmark } from "./construction-wordmark";
 import { NewsletterForm } from "./newsletter-form";
 import { SocialLinks } from "./site-header";
 import { WhatsAppIcon } from "./icons";
@@ -80,16 +81,14 @@ export function SiteFooter() {
         </div>
 
         <div>
-          <h2 className="font-sans text-sm font-semibold tracking-wider text-white uppercase">New launches</h2>
-          <p className="mt-4 mb-4 text-sm">Be first to hear about new projects and pre-launch prices.</p>
+          <h2 className="font-sans text-sm font-semibold tracking-wider text-white uppercase">New-launch alerts</h2>
+          <p className="mt-4 mb-4 text-sm">Get one email when we launch a new project, with pre-launch prices. No spam.</p>
           <NewsletterForm />
         </div>
       </div>
-      {/* Signature wordmark: spans the full width, revealed as the footer scrolls in. */}
-      <div aria-hidden className="overflow-hidden px-4 sm:px-6 lg:px-8">
-        <p className="footer-mark text-center font-display text-[17.5vw] leading-[0.82] tracking-tight whitespace-nowrap text-transparent [-webkit-text-stroke:1.5px_rgb(232_194_122/0.8)]">
-          Real Value
-        </p>
+      {/* Signature wordmark: drawn and built like a building as the footer scrolls in. */}
+      <div className="container-x pt-2 pb-10 sm:pb-14">
+        <ConstructionWordmark />
       </div>
       <div className="border-t border-white/10">
         <div className="container-x flex flex-col gap-2 py-6 text-xs text-white/50 sm:flex-row sm:justify-between">

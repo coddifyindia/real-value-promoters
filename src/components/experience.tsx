@@ -6,7 +6,7 @@ import { Suspense, useEffect, useRef } from "react";
 
 /**
  * Site-wide feel for mouse and trackpad users: inertial smooth scrolling and a
- * cursor that labels what you're about to open. Touch devices and anyone who
+ * small label next to the pointer naming what you're about to open. Touch devices and anyone who
  * prefers reduced motion get the browser's native behaviour.
  */
 export function Experience() {
@@ -46,56 +46,51 @@ function SmoothScroll() {
 }
 
 function Cursor() {
-  const ring = useRef<HTMLDivElement>(null);
-  const label = useRef<HTMLSpanElement>(null);
+  const tag = useRef<HTMLDivElement>(null);
+  const text = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    const el = ring.current;
+    const el = tag.current;
     if (!el || !finePointer()) return;
-    let x = -100;
-    let y = -100;
-    let tx = -100;
-    let ty = -100;
+    let x = -200;
+    let y = -200;
+    let tx = -200;
+    let ty = -200;
     let frame = 0;
     document.documentElement.classList.add("has-cursor");
 
+    // Follows closely (not a floaty trail), so it reads as part of the pointer.
     const loop = () => {
-      x += (tx - x) * 0.2;
-      y += (ty - y) * 0.2;
+      x += (tx - x) * 0.45;
+      y += (ty - y) * 0.45;
       el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
       frame = requestAnimationFrame(loop);
     };
     const move = (e: PointerEvent) => {
       tx = e.clientX;
       ty = e.clientY;
-      const target = e.target as Element | null;
-      const labelled = target?.closest<HTMLElement>("[data-cursor]");
-      const interactive = target?.closest("a, button, select, input, textarea, label, [role=radio]");
-      el.dataset.state = labelled ? "label" : interactive ? "hover" : "";
-      if (label.current) label.current.textContent = labelled?.dataset.cursor ?? "";
+      const labelled = (e.target as Element | null)?.closest<HTMLElement>("[data-cursor]");
+      if (labelled) {
+        if (text.current) text.current.textContent = labelled.dataset.cursor ?? "";
+        el.dataset.on = "";
+      } else delete el.dataset.on;
     };
-    const leave = () => (el.dataset.state = "hidden");
-    const down = () => el.classList.add("is-down");
-    const up = () => el.classList.remove("is-down");
+    const leave = () => delete el.dataset.on;
 
     window.addEventListener("pointermove", move, { passive: true });
     document.addEventListener("pointerleave", leave);
-    window.addEventListener("pointerdown", down);
-    window.addEventListener("pointerup", up);
     frame = requestAnimationFrame(loop);
     return () => {
       cancelAnimationFrame(frame);
       document.documentElement.classList.remove("has-cursor");
       window.removeEventListener("pointermove", move);
       document.removeEventListener("pointerleave", leave);
-      window.removeEventListener("pointerdown", down);
-      window.removeEventListener("pointerup", up);
     };
   }, []);
 
   return (
-    <div ref={ring} aria-hidden className="cursor-ring">
-      <span ref={label} />
+    <div ref={tag} aria-hidden className="cursor-tag">
+      <span ref={text} />
     </div>
   );
 }

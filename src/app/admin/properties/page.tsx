@@ -7,6 +7,7 @@ import { TableSkeleton } from "@/components/skeletons";
 import { requireAdmin } from "@/lib/auth";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { PROPERTY_TYPE_LABELS, type Property } from "@/lib/types";
+import { PageHeader, Stat } from "../page-header";
 import { SetupNotice } from "../setup-notice";
 
 export const metadata: Metadata = { title: "Properties" };
@@ -34,40 +35,52 @@ async function PropertyList() {
   >[];
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-3xl">Properties</h1>
-          <p className="mt-1 text-sm text-slate-600">
-            {properties.filter((p) => p.published).length} live · {properties.filter((p) => !p.published).length} hidden
-          </p>
-        </div>
+    <div className="space-y-8">
+      <PageHeader
+        title="Properties"
+        description="The projects shown on the website. Click one to edit its details, prices and photos, or hide it without deleting."
+        meta={
+          <>
+            <Stat tone="green">{properties.filter((p) => p.published).length} live</Stat>
+            <Stat>{properties.filter((p) => !p.published).length} hidden</Stat>
+          </>
+        }
+      >
         <Link href="/admin/properties/new" className="btn-primary">
           <Plus className="size-4" aria-hidden /> Add property
         </Link>
-      </div>
-      <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      </PageHeader>
+      <ul className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {properties.map((p) => (
           <li key={p.id}>
             <Link
               href={`/admin/properties/${p.id}`}
-              className="flex gap-3 rounded-2xl bg-white p-3 ring-1 ring-slate-200 transition hover:ring-brand-500"
+              className="group flex h-full flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200 transition hover:shadow-card hover:ring-brand-500"
             >
-              <div className="relative aspect-square w-20 shrink-0 overflow-hidden rounded-xl bg-slate-100">
-                {p.images[0] && <Image src={p.images[0]} alt="" fill sizes="80px" className="object-cover" />}
+              <div className="relative aspect-[16/9] bg-slate-100">
+                {p.images[0] && <Image src={p.images[0]} alt="" fill sizes="(min-width: 1280px) 400px, (min-width: 640px) 50vw, 100vw" className="object-cover" />}
+                <span
+                  className={`absolute top-3 left-3 inline-flex h-7 items-center rounded-full px-3 text-xs font-semibold ${
+                    p.published ? "bg-green-600 text-white" : "bg-slate-700 text-white"
+                  }`}
+                >
+                  {p.published ? "Live" : "Hidden"}
+                </span>
+                {p.featured && (
+                  <span className="absolute top-3 right-3 inline-flex h-7 items-center gap-1 rounded-full bg-gold-400 px-3 text-xs font-semibold text-navy-950">
+                    <Star className="size-3.5 fill-current" aria-hidden /> Featured
+                  </span>
+                )}
               </div>
-              <div className="min-w-0">
-                <p className="flex items-center gap-1 truncate font-semibold text-navy-900">
-                  {p.featured && <Star className="size-4 shrink-0 fill-gold-400 text-gold-400" aria-label="Featured" />}
-                  {p.name}
-                </p>
-                <p className="text-sm text-slate-500">
+              <div className="flex flex-1 flex-col p-5">
+                <p className="font-display text-xl leading-snug text-navy-900">{p.name}</p>
+                <p className="mt-1 text-sm text-slate-500">
                   {PROPERTY_TYPE_LABELS[p.type]} · {p.city}
                 </p>
-                <p className="text-sm text-brand-700">{p.price_label}</p>
-                {!p.published && (
-                  <span className="mt-1 inline-block rounded-full bg-slate-200 px-2 py-0.5 text-xs text-slate-600">Hidden</span>
-                )}
+                <div className="mt-auto flex items-center justify-between gap-3 pt-5">
+                  <p className="font-semibold text-brand-700">{p.price_label}</p>
+                  <span className="text-sm font-medium text-slate-500 group-hover:text-navy-900">Edit →</span>
+                </div>
               </div>
             </Link>
           </li>

@@ -11,17 +11,17 @@ export function LoginForm() {
   const [state, action, pending] = useActionState(signIn, { status: "idle" } as FormState);
   const onSubmit = useActionSubmit(action);
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} className="space-y-5">
       <div>
         <label htmlFor="email" className="label">Email</label>
         <WithIcon icon={Mail}>
-          <input id="email" name="email" type="email" autoComplete="username" required className="field field-icon" />
+          <input id="email" name="email" type="email" autoComplete="username" required placeholder="you@realvaluepromoters.com" className="field field-icon" />
         </WithIcon>
       </div>
       <div>
         <label htmlFor="password" className="label">Password</label>
         <WithIcon icon={LockKeyhole}>
-          <input id="password" name="password" type="password" autoComplete="current-password" required className="field field-icon" />
+          <input id="password" name="password" type="password" autoComplete="current-password" required placeholder="Your password" className="field field-icon" />
         </WithIcon>
       </div>
       {state.status === "error" && (
