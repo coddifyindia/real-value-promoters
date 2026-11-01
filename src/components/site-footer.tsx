@@ -85,6 +85,12 @@ export function SiteFooter() {
           <NewsletterForm />
         </div>
       </div>
+      {/* Signature wordmark: spans the full width, revealed as the footer scrolls in. */}
+      <div aria-hidden className="overflow-hidden px-4 sm:px-6 lg:px-8">
+        <p className="footer-mark text-center font-display text-[17.5vw] leading-[0.82] tracking-tight whitespace-nowrap text-transparent [-webkit-text-stroke:1.5px_rgb(232_194_122/0.8)]">
+          Real Value
+        </p>
+      </div>
       <div className="border-t border-white/10">
         <div className="container-x flex flex-col gap-2 py-6 text-xs text-white/50 sm:flex-row sm:justify-between">
           <p>

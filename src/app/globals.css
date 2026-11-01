@@ -451,3 +451,238 @@
   color: transparent;
   -webkit-text-stroke: 1.5px currentColor;
 }
+
+/* Hero scroll cue: a gold bead travels down the line. */
+@keyframes cue {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(200%);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .scroll-cue span span {
+    animation: cue 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  }
+}
+
+/* ---------- Pinned horizontal gallery ----------
+   Without scroll-driven animation support, on small screens, or with reduced
+   motion it is a swipeable row that snaps to each project. */
+.gallery-viewport {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.gallery-viewport::-webkit-scrollbar {
+  display: none;
+}
+@keyframes gallery-x {
+  to {
+    transform: translateX(calc(-100% + 100vw));
+  }
+}
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .gallery {
+      height: 360vh;
+      view-timeline-name: --gallery;
+    }
+    .gallery-stage {
+      position: sticky;
+      top: 0;
+      height: 100svh;
+    }
+    .gallery-viewport {
+      overflow: visible;
+    }
+    .gallery-track {
+      animation: gallery-x linear both;
+      animation-timeline: --gallery;
+      animation-range: contain 0% contain 100%;
+    }
+  }
+}
+
+/* Footer wordmark rises into view and its outline fills with gold. */
+@keyframes mark-rise {
+  from {
+    transform: translateY(35%);
+    opacity: 0.2;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .footer-mark {
+      animation: mark-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 45%;
+    }
+  }
+}
+
+/* ---------- Intro curtain (home page, first view per visit) ---------- */
+.intro-curtain {
+  display: none;
+}
+@keyframes intro-letter {
+  from {
+    transform: translateY(105%);
+  }
+}
+@keyframes intro-line {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes intro-out {
+  to {
+    transform: translateY(-100%);
+    visibility: hidden;
+  }
+}
+@keyframes intro-fade {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  :root:not(.no-intro) .intro-curtain {
+    display: grid;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    place-items: center;
+    pointer-events: none;
+    background: var(--color-navy-950);
+    animation: intro-out 0.9s cubic-bezier(0.76, 0, 0.24, 1) 1.25s forwards;
+  }
+  .intro-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  .intro-word {
+    display: flex;
+    overflow: clip;
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 12vw, 9rem);
+    line-height: 1;
+    color: white;
+  }
+  .intro-word > span {
+    display: inline-block;
+    animation: intro-letter 0.8s cubic-bezier(0.2, 0.75, 0.15, 1) both;
+    animation-delay: calc(var(--i) * 45ms);
+  }
+  .intro-line {
+    display: block;
+    width: min(60vw, 420px);
+    height: 1px;
+    background: var(--color-gold-400);
+    transform-origin: left;
+    animation: intro-line 1s cubic-bezier(0.65, 0, 0.35, 1) 0.2s both;
+  }
+  .intro-tag {
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.6);
+    animation: intro-fade 0.6s ease 0.5s both;
+  }
+  /* While the curtain plays, hold the hero's own entrance until it lifts. */
+  :root:not(.no-intro) body:has(.intro-curtain) [data-split="load"] .split-word > span {
+    animation-delay: calc(var(--w) * 70ms + 1.55s);
+  }
+  :root:not(.no-intro) body:has(.intro-curtain) .enter {
+    animation-delay: calc(var(--d, 0) * 120ms + 1.5s);
+  }
+}
+
+/* ---------- Custom cursor (mouse/trackpad only) ---------- */
+.cursor-ring {
+  display: none;
+}
+.has-cursor .cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.has-cursor .cursor-ring::before {
+  content: "";
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  left: 0;
+  top: 0;
+  border-radius: 999px;
+  border: 1.5px solid rgb(200 150 62 / 0.85);
+  transition:
+    width 0.35s cubic-bezier(0.2, 0.75, 0.15, 1),
+    height 0.35s cubic-bezier(0.2, 0.75, 0.15, 1),
+    margin 0.35s cubic-bezier(0.2, 0.75, 0.15, 1),
+    background-color 0.35s,
+    border-color 0.35s,
+    opacity 0.3s;
+}
+.has-cursor .cursor-ring > span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-navy-950);
+  opacity: 0;
+  transition: opacity 0.25s;
+  white-space: nowrap;
+}
+.cursor-ring[data-state="hover"]::before {
+  width: 52px;
+  height: 52px;
+  margin: -26px 0 0 -26px;
+  background: rgb(220 171 82 / 0.12);
+}
+.cursor-ring[data-state="label"]::before {
+  width: 96px;
+  height: 96px;
+  margin: -48px 0 0 -48px;
+  background: var(--color-gold-400);
+  border-color: transparent;
+}
+.cursor-ring[data-state="label"] > span {
+  opacity: 1;
+}
+.cursor-ring[data-state="hidden"]::before {
+  opacity: 0;
+}
+.cursor-ring.is-down::before {
+  scale: 0.85;
+}
+.has-cursor [data-cursor],
+.has-cursor [data-cursor] a {
+  cursor: none;
+}
+
+/* Film grain: a faint noise layer that takes the digital flatness off large colour fields. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  z-index: 80;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}

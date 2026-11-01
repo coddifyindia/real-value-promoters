@@ -1,4 +1,5 @@
 import { UtmCapture } from "@/components/form-meta";
+import { Experience } from "@/components/experience";
 import { MobileActionBar } from "@/components/mobile-action-bar";
 import { RevealObserver } from "@/components/motion";
 import { SiteFooter } from "@/components/site-footer";
@@ -21,6 +22,7 @@ export default function SiteLayout({ children }: LayoutProps<"/">) {
       <MobileActionBar />
       <UtmCapture />
       <RevealObserver />
+      <Experience />
     </>
   );
 }
