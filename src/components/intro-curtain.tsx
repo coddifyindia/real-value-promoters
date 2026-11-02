@@ -18,7 +18,11 @@ export function IntroCurtain() {
             ))}
           </span>
           <span className="intro-line" />
-          <span className="intro-tag">Coimbatore · Trichy · Madurai · Erode · Pollachi</span>
+          <span className="intro-tag">
+            {["Coimbatore", "Trichy", "Madurai", "Erode", "Pollachi"].map((city) => (
+              <span key={city}>{city}</span>
+            ))}
+          </span>
         </div>
       </div>
     </>

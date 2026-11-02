@@ -298,7 +298,7 @@ export default async function HomePage() {
 
       {/* Cities: large-type index with a cursor-following preview */}
       <section className="bg-white py-20 sm:py-28">
-        <div className="container-x grid gap-12 lg:grid-cols-[minmax(0,0.42fr)_minmax(0,1fr)] lg:gap-16">
+        <div className="container-x grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,0.42fr)_minmax(0,1fr)] lg:gap-16">
           <div className="lg:sticky lg:top-32 lg:self-start">
             <p className="eyebrow">Where we build</p>
             <h2 className="mt-2 text-4xl leading-[1.05] sm:text-5xl">

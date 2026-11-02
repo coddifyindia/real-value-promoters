@@ -120,7 +120,7 @@ function HeaderView({ pathname }: { pathname: string | null }) {
           onClick={() => setOpen(false)}
         />
         <div
-          className={`absolute inset-y-0 right-0 flex w-[min(22rem,88vw)] flex-col bg-white shadow-xl transition-transform duration-300 ${open ? "translate-x-0" : "translate-x-full"}`}
+          className={`absolute inset-y-0 right-0 flex w-[min(22rem,88vw)] flex-col bg-white transition-[translate,box-shadow] duration-300 ${open ? "translate-x-0 shadow-xl" : "translate-x-full shadow-none"}`}
         >
           <div className="flex h-16 items-center justify-between border-b border-slate-200 px-4">
             <span className="font-display text-lg text-navy-900">Menu</span>

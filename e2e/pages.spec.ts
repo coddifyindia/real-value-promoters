@@ -19,7 +19,18 @@ for (const path of pages) {
     await page.waitForLoadState("networkidle");
 
     // No sideways scrolling at any width: the old site's biggest mobile problem.
-    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    // Measured against clientWidth (the device width), not innerWidth: a phone
+    // browser zooms out to fit a too-wide page, which widens innerWidth to match
+    // it, so comparing with innerWidth always reads 0. And <main> clips sideways
+    // overflow as a safety net, so lift the clip while measuring, or the net
+    // would hide the very bug this checks for.
+    const overflow = await page.evaluate(() => {
+      const main = document.querySelector("main");
+      if (main) main.style.overflowX = "visible";
+      const px = document.documentElement.scrollWidth - document.documentElement.clientWidth;
+      if (main) main.style.overflowX = "";
+      return px;
+    });
     expect(overflow, "horizontal overflow in px").toBeLessThanOrEqual(0);
 
     expect(errors, "console / page errors").toEqual([]);

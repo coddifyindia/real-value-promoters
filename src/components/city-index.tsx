@@ -18,14 +18,14 @@ export function CityIndex({ cities }: { cities: City[] }) {
         <li key={c.city} className="border-b border-navy-900/15">
           <Link
             href={`/properties?city=${encodeURIComponent(c.city)}`}
-            className="group -mx-3 flex items-center gap-4 rounded-2xl px-3 py-5 transition-colors duration-300 hover:bg-sand-50 focus-visible:bg-sand-50 sm:-mx-5 sm:gap-6 sm:px-5 sm:py-6"
+            className="group -mx-3 flex items-center gap-3 rounded-2xl px-3 py-5 transition-colors duration-300 hover:bg-sand-50 focus-visible:bg-sand-50 sm:-mx-5 sm:gap-6 sm:px-5 sm:py-6"
           >
             <span className="w-7 shrink-0 font-sans text-sm font-semibold text-gold-700 tabular-nums sm:w-9 sm:text-base">
               {String(i + 1).padStart(2, "0")}
             </span>
 
             {c.image && (
-              <span className="relative size-16 shrink-0 overflow-hidden rounded-xl sm:size-20 pointer-fine:h-20 pointer-fine:w-0 pointer-fine:opacity-0 pointer-fine:transition-[width,opacity] pointer-fine:duration-500 pointer-fine:ease-[cubic-bezier(0.2,0.75,0.15,1)] pointer-fine:group-hover:w-32 pointer-fine:group-hover:opacity-100 pointer-fine:group-focus-visible:w-32 pointer-fine:group-focus-visible:opacity-100">
+              <span className="relative size-14 shrink-0 overflow-hidden rounded-xl sm:size-20 pointer-fine:h-20 pointer-fine:w-0 pointer-fine:opacity-0 pointer-fine:transition-[width,opacity] pointer-fine:duration-500 pointer-fine:ease-[cubic-bezier(0.2,0.75,0.15,1)] pointer-fine:group-hover:w-32 pointer-fine:group-hover:opacity-100 pointer-fine:group-focus-visible:w-32 pointer-fine:group-focus-visible:opacity-100">
                 <Image
                   src={c.image}
                   alt=""
@@ -37,7 +37,7 @@ export function CityIndex({ cities }: { cities: City[] }) {
             )}
 
             <span className="min-w-0 flex-1">
-              <span className="block font-display text-[2.5rem] leading-[1.1] text-navy-900 transition-colors duration-300 group-hover:text-brand-700 sm:text-6xl">
+              <span className="block font-display text-[clamp(1.75rem,8.5vw,2.5rem)] leading-[1.1] break-words text-navy-900 transition-colors duration-300 group-hover:text-brand-700 sm:text-6xl">
                 {c.city}
               </span>
               <span className="mt-1 block text-sm text-slate-600 sm:hidden">
