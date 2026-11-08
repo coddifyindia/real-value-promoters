@@ -6,3 +6,4 @@ export const supabasePublishableKey =
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabasePublishableKey);
 
 export const PROPERTY_IMAGES_BUCKET = "property-images";
+export const SITE_MEDIA_BUCKET = "site-media";

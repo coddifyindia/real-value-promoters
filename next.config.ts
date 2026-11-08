@@ -23,7 +23,8 @@ const csp = [
   "font-src 'self' data:",
   `connect-src 'self'${supabaseOrigin}${vercelLive}${isDev ? " ws:" : ""}`,
   `frame-src https://www.youtube-nocookie.com https://www.google.com${vercelLive}`,
-  "media-src 'self'",
+  // blob: lets the admin preview a video before uploading it.
+  `media-src 'self' blob:${supabaseOrigin}`,
   "worker-src 'self' blob:",
   "object-src 'none'",
   "base-uri 'self'",

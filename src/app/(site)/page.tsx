@@ -17,7 +17,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { WithIcon } from "@/components/field";
-import { Hero3D } from "@/components/hero/hero-3d";
+import { HeroVideo } from "@/components/hero-video";
 import { IntroCurtain } from "@/components/intro-curtain";
 import { LeadForm } from "@/components/lead-form";
 import { Magnetic, SplitText } from "@/components/motion";
@@ -25,6 +25,7 @@ import { CityIndex } from "@/components/city-index";
 import { ProjectGallery } from "@/components/project-gallery";
 import { SectionHeading } from "@/components/section-heading";
 import { getCities, getPublishedProperties } from "@/lib/properties";
+import { getHeroVideo } from "@/lib/site-settings";
 import { testimonials } from "@/lib/content";
 
 const trust = [
@@ -41,36 +42,6 @@ const reasons = [
   { icon: Trees, title: "Amenities that matter", text: "Gated entrances, tar roads, parks, street lights, water lines and CCTV in our layouts." },
   { icon: Landmark, title: "Trusted partners", text: "Channel partner of Greenfield Housing, with tie-ups across leading banks." },
   { icon: BadgeCheck, title: "After-sales support", text: "We stay in touch after registration for construction, resale and documentation help." },
-];
-
-const heroSlides = [
-  { src: "/images/properties/diamond-avenue/01.webp", alt: "Entrance arch of Diamond Avenue, a Real Value gated community in Coimbatore" },
-  { src: "/images/properties/golden-farms/01.webp", alt: "" },
-  { src: "/images/properties/crystal-gateway/01.webp", alt: "" },
-  { src: "/images/properties/thulir-garden/01.webp", alt: "" },
-];
-
-const chapters = [
-  {
-    number: "02",
-    title: "Every plot, approved.",
-    text: "DTCP & RERA approved layouts with clear titles. The plots glowing gold are open for booking right now.",
-    legend: [
-      ["bg-gold-400", "Available plot"],
-      ["bg-[#cdbf9f]", "Booked"],
-    ],
-    cta: false,
-  },
-  {
-    number: "03",
-    title: "Build the home you imagine.",
-    text: "Up to 85% bank loan support, help with approvals, and one team from your first visit to registration.",
-    legend: [
-      ["bg-white", "Villa"],
-      ["bg-[#7d9a5b]", "Park & greenery"],
-    ],
-    cta: true,
-  },
 ];
 
 const bandWords = ["Gated plots", "Villas", "Farm land", "DTCP approved", "Bank loans", "Free site visits"];
@@ -93,7 +64,7 @@ const steps = [
 ];
 
 export default async function HomePage() {
-  const properties = await getPublishedProperties();
+  const [properties, heroVideo] = await Promise.all([getPublishedProperties(), getHeroVideo()]);
   const featured = properties.filter((p) => p.featured).slice(0, 6);
   const cities = getCities(properties);
   // Biggest market first: it gets the large tile.
@@ -108,38 +79,17 @@ export default async function HomePage() {
     <>
       <IntroCurtain />
 
-      {/* Hero: a live 3D model of a gated layout. On large screens the section is
-          pinned for three screens of scrolling, and the copy moves through three
-          chapters while the camera flies over the site. */}
-      <section
-        id="hero"
-        data-chapter="1"
-        className="group/hero relative bg-navy-950 motion-safe:lg:h-[300vh]"
-      >
-        <div className="relative isolate flex min-h-[92svh] flex-col overflow-hidden motion-safe:lg:sticky motion-safe:lg:top-0 motion-safe:lg:h-svh lg:min-h-[720px]">
-          <div className="hero-parallax absolute inset-0 -z-30">
-            {heroSlides.map((slide, i) => (
-              <div key={slide.src} className="hero-slide absolute inset-0" style={{ "--i": i } as React.CSSProperties}>
-                <Image
-                  src={slide.src}
-                  alt={i === 0 ? slide.alt : ""}
-                  fill
-                  priority={i === 0}
-                  sizes="100vw"
-                  className="object-cover"
-                />
-              </div>
-            ))}
+      {/* Hero: the client's video fills the banner, darkened under the copy. */}
+      <section id="hero" className="relative bg-navy-950">
+        <div className="relative isolate flex min-h-[92svh] flex-col overflow-hidden lg:min-h-[720px]">
+          <div className="hero-parallax absolute inset-0 -z-20">
+            <HeroVideo {...heroVideo} />
           </div>
-          <div className="absolute inset-0 -z-20">
-            <Hero3D sectionId="hero" />
-          </div>
-          {/* Legibility: dark on the copy side, open on the model side. */}
-          <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-t from-navy-950 via-navy-950/70 to-navy-950/30 lg:bg-gradient-to-r lg:from-navy-950/95 lg:via-navy-950/45 lg:to-transparent" />
+          {/* Legibility: dark under the copy, lighter where the video shows through. */}
+          <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-t from-navy-950 via-navy-950/60 to-navy-950/30 lg:bg-gradient-to-r lg:from-navy-950/90 lg:via-navy-950/45 lg:to-navy-950/10" />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-t from-navy-950 to-transparent" />
 
-          {/* Chapter 1: the pitch, search and numbers */}
-          <div className="container-x flex flex-1 flex-col justify-end pt-24 pb-10 transition-[opacity,translate] duration-700 ease-out sm:pb-14 lg:justify-center lg:pt-16 lg:pb-16 lg:group-data-[chapter=2]/hero:pointer-events-none lg:group-data-[chapter=2]/hero:-translate-y-8 lg:group-data-[chapter=2]/hero:opacity-0 lg:group-data-[chapter=3]/hero:pointer-events-none lg:group-data-[chapter=3]/hero:-translate-y-8 lg:group-data-[chapter=3]/hero:opacity-0">
+          <div className="hero-fade container-x flex flex-1 flex-col justify-end pt-24 pb-10 sm:pb-14 lg:justify-center lg:pt-16 lg:pb-16">
             <p className="enter inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 text-xs font-medium text-white/90 backdrop-blur-md" style={{ "--d": 0 } as React.CSSProperties}>
               <Sparkles className="size-3.5 text-gold-300" aria-hidden />
               DTCP &amp; RERA approved · {properties.length} live projects
@@ -208,70 +158,6 @@ export default async function HomePage() {
             </dl>
           </div>
 
-          {/* Chapters 2 and 3 (large screens, while pinned) */}
-          {chapters.map((c, i) => (
-            <div
-              key={c.title}
-              aria-hidden
-              className={`pointer-events-none absolute inset-y-0 left-0 hidden w-full items-center opacity-0 transition-[opacity,translate] duration-700 ease-out motion-safe:lg:flex ${
-                i === 0
-                  ? "translate-y-8 group-data-[chapter=2]/hero:pointer-events-auto group-data-[chapter=2]/hero:translate-y-0 group-data-[chapter=2]/hero:opacity-100"
-                  : "translate-y-8 group-data-[chapter=3]/hero:pointer-events-auto group-data-[chapter=3]/hero:translate-y-0 group-data-[chapter=3]/hero:opacity-100"
-              }`}
-            >
-              <div className="container-x">
-                <p className="font-display text-8xl text-gold-400/90 italic">{c.number}</p>
-                <h2 className="mt-2 max-w-xl text-6xl leading-[1.08] text-white">{c.title}</h2>
-                <p className="mt-6 max-w-md text-lg text-white/75">{c.text}</p>
-                <div className="mt-8 flex flex-wrap items-center gap-3">
-                  {c.legend.map(([swatch, label]) => (
-                    <span key={label} className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/85 backdrop-blur">
-                      <span className={`size-3 rounded-sm ${swatch}`} aria-hidden /> {label}
-                    </span>
-                  ))}
-                </div>
-                {c.cta && (
-                  <div className="mt-10 flex gap-3">
-                    <Magnetic>
-                      <Link href="/properties" className="btn-gold btn-lg" tabIndex={-1}>
-                        Explore all projects <ArrowUpRight className="size-5" aria-hidden />
-                      </Link>
-                    </Magnetic>
-                    <Link href="/contact#enquire" className="btn-glass btn-lg" tabIndex={-1}>
-                      Book a site visit
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-
-          {/* Chapter rail + scroll cue: bottom-right corner, clear of the copy and the numbers. */}
-          <div aria-hidden className="pointer-events-none absolute right-8 bottom-8 hidden flex-col items-end gap-4 motion-safe:lg:flex">
-            <ol className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-navy-950/60 px-5 py-4 text-right text-[11px] tracking-[0.2em] text-white/50 uppercase backdrop-blur-md">
-              {["The layout", "Approved plots", "Your home"].map((label, i) => (
-                <li
-                  key={label}
-                  className={`flex items-center justify-end gap-3 transition-colors duration-500 ${
-                    ["group-data-[chapter=1]/hero:text-white", "group-data-[chapter=2]/hero:text-white", "group-data-[chapter=3]/hero:text-white"][i]
-                  }`}
-                >
-                  {label}
-                  <span
-                    className={`h-px w-5 bg-current transition-all duration-500 ${
-                      ["group-data-[chapter=1]/hero:w-10 group-data-[chapter=1]/hero:bg-gold-400", "group-data-[chapter=2]/hero:w-10 group-data-[chapter=2]/hero:bg-gold-400", "group-data-[chapter=3]/hero:w-10 group-data-[chapter=3]/hero:bg-gold-400"][i]
-                    }`}
-                  />
-                </li>
-              ))}
-            </ol>
-            <div className="scroll-cue flex items-center gap-3 text-[11px] tracking-[0.25em] text-white/60 uppercase transition-opacity duration-500 group-data-[chapter=3]/hero:opacity-0">
-              Scroll to explore
-              <span className="relative h-8 w-px overflow-hidden bg-white/20">
-                <span className="absolute inset-x-0 top-0 h-1/2 bg-gold-400" />
-              </span>
-            </div>
-          </div>
         </div>
       </section>
 
