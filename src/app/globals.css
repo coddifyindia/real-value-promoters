@@ -131,26 +131,6 @@
     transform: none;
   }
 }
-@keyframes hero-cycle {
-  0% {
-    opacity: 0;
-    transform: scale(1.12);
-  }
-  6% {
-    opacity: 1;
-  }
-  25% {
-    opacity: 1;
-  }
-  31% {
-    opacity: 0;
-    transform: scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1);
-  }
-}
 @keyframes marquee {
   to {
     transform: translateX(-50%);
@@ -170,23 +150,12 @@
   }
 }
 
-/* Hero slideshow: four photos crossfade with a slow zoom ("Ken Burns").
-   24s cycle, each slide on screen for 6s; the negative offset makes the
-   first photo visible on the very first frame so it can be the LCP image. */
-.hero-slide:not(:first-child) {
-  opacity: 0;
-}
 /* Hidden unless the browser can drive it from scroll position. */
 .scroll-progress {
   transform: scaleX(0);
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .hero-slide {
-    animation: hero-cycle 24s linear infinite both;
-    animation-delay: calc(var(--i, 0) * 6s - 1.5s);
-  }
-
   /* Staggered entrance for above-the-fold content. */
   .enter {
     animation: fade-up 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
@@ -413,7 +382,7 @@
     transition: transform 0.35s cubic-bezier(0.2, 0.75, 0.15, 1);
   }
 
-  /* Hero parallax: the photos drift slower than the page and the copy fades as it scrolls away. */
+  /* Hero parallax: the video drifts slower than the page and the copy fades as it scrolls away. */
   @supports (animation-timeline: scroll()) {
     .hero-parallax {
       animation: parallax-drift linear both;
@@ -467,21 +436,6 @@
   color: transparent;
   /* Not currentColor: that is the transparent fill, which hid the outline entirely. */
   -webkit-text-stroke: 1.5px var(--color-navy-900);
-}
-
-/* Hero scroll cue: a gold bead travels down the line. */
-@keyframes cue {
-  from {
-    transform: translateY(-100%);
-  }
-  to {
-    transform: translateY(200%);
-  }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .scroll-cue span span {
-    animation: cue 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
-  }
 }
 
 /* ---------- Carousel (components/carousel.tsx) ----------

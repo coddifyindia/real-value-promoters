@@ -80,7 +80,9 @@ test.describe("with database", () => {
   });
 
   test("admin area is login-protected", async ({ page }) => {
-    await page.goto("/admin");
-    await expect(page).toHaveURL(/\/admin\/login$/);
+    for (const path of ["/admin", "/admin/banner"]) {
+      await page.goto(path);
+      await expect(page).toHaveURL(/\/admin\/login$/);
+    }
   });
 });

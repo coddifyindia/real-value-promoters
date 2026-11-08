@@ -1,6 +1,6 @@
 "use client";
 
-import { BellRing, Building2, ExternalLink, Inbox, LayoutDashboard, LogOut } from "lucide-react";
+import { BellRing, Building2, Clapperboard, ExternalLink, Inbox, LayoutDashboard, LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "@/app/actions/admin";
@@ -8,6 +8,7 @@ import { signOut } from "@/app/actions/admin";
 const links = [
   { href: "/admin", label: "Leads", icon: Inbox },
   { href: "/admin/properties", label: "Properties", icon: Building2 },
+  { href: "/admin/banner", label: "Banner video", icon: Clapperboard },
   { href: "/admin/subscribers", label: "Launch alerts", icon: BellRing },
 ];
 

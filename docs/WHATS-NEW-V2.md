@@ -43,7 +43,7 @@ Modelled on this year's Awwwards real-estate winners (ERA Residence, Belgrade Ar
 
 | Area | What changed |
 | --- | --- |
-| **3D hero** | A live 3D model of a gated layout (plots, roads, park, avenue trees, compound wall, entrance arch) in golden-hour light. On desktop, scrolling tells a three-part story: the layout, available plots lifting and glowing gold, then villas rising. Phones get a lighter version that plays on its own. It loads after the page is usable, pauses when off screen, and visitors who prefer reduced motion see the photo hero instead. |
+| **3D hero** *(replaced in November 2026 by a client-supplied banner video, managed at /admin/banner)* | A live 3D model of a gated layout (plots, roads, park, avenue trees, compound wall, entrance arch) in golden-hour light. On desktop, scrolling tells a three-part story: the layout, available plots lifting and glowing gold, then villas rising. Phones get a lighter version that plays on its own. It loads after the page is usable, pauses when off screen, and visitors who prefer reduced motion see the photo hero instead. |
 | **Projects** | A pinned horizontal gallery: scrolling down slides the projects sideways, with large photos and numbering. On phones it's a swipeable row. |
 | **Cities** | A large-type index. With a mouse, a photo of each city's projects follows the cursor. |
 | **Editorial layout** | "Why us" and reviews are set as typography rather than icon cards, and the footer ends with a giant "Real Value" wordmark. |

@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/auth";
 import { PROPERTIES_TAG } from "@/lib/properties";
+import { heroVideoSchema, type HeroVideoSetting, SITE_SETTINGS_TAG } from "@/lib/site-settings";
+import { SITE_MEDIA_BUCKET } from "@/lib/supabase/config";
 import { createSessionClient } from "@/lib/supabase/server";
 import { lines, parseJsonArray, propertySchema } from "@/lib/property-schema";
 import { LEAD_STATUSES } from "@/lib/types";
@@ -110,4 +112,65 @@ export async function deleteProperty(formData: FormData) {
   if (error) throw new Error("Property delete failed", { cause: error });
   refreshPublicPages();
   redirect("/admin/properties");
+}
+
+// ---------------------------------------------------------------------------
+// Home page banner video
+// The browser uploads the files straight to Storage (Vercel functions cap
+// request bodies at 4.5 MB, far below a video), then sends only their paths.
+// The public URLs are built here, so the setting can only ever point at our
+// own bucket.
+// ---------------------------------------------------------------------------
+
+const heroPaths = z.object({
+  srcPath: z.string().regex(/^hero\/[0-9a-f-]{36}\.(mp4|webm)$/),
+  posterPath: z.string().regex(/^hero\/[0-9a-f-]{36}\.webp$/),
+});
+
+type AdminClient = Awaited<ReturnType<typeof requireAdmin>>["supabase"];
+
+/** Read uncached: these files are about to be deleted, so it must be the live value. */
+async function currentHeroVideo(supabase: AdminClient) {
+  const { data } = await supabase.from("site_settings").select("value").eq("key", "hero_video").maybeSingle();
+  const parsed = heroVideoSchema.safeParse(data?.value);
+  return parsed.success ? parsed.data : null;
+}
+
+export async function saveHeroVideo(input: { srcPath: string; posterPath: string }): Promise<FormState> {
+  const parsed = heroPaths.safeParse(input);
+  if (!parsed.success) return { status: "error", message: "That upload didn't finish properly. Please try again." };
+  const { srcPath, posterPath } = parsed.data;
+
+  const { supabase } = await requireAdmin();
+  const previous = await currentHeroVideo(supabase);
+  const bucket = supabase.storage.from(SITE_MEDIA_BUCKET);
+  const value: HeroVideoSetting = {
+    src: bucket.getPublicUrl(srcPath).data.publicUrl,
+    poster: bucket.getPublicUrl(posterPath).data.publicUrl,
+    srcPath,
+    posterPath,
+  };
+  const { error } = await supabase.from("site_settings").upsert({ key: "hero_video", value });
+  if (error) {
+    console.error("[admin] hero video save failed", error);
+    return { status: "error", message: "Couldn't save the video. Please try again." };
+  }
+
+  updateTag(SITE_SETTINGS_TAG);
+  // The old files are no longer used; a failed cleanup only leaves them in storage.
+  if (previous) await bucket.remove([previous.srcPath, previous.posterPath]).catch(() => {});
+  return { status: "success", message: "Saved. The new video is live on the home page." };
+}
+
+export async function resetHeroVideo(): Promise<FormState> {
+  const { supabase } = await requireAdmin();
+  const previous = await currentHeroVideo(supabase);
+  const { error } = await supabase.from("site_settings").delete().eq("key", "hero_video");
+  if (error) {
+    console.error("[admin] hero video reset failed", error);
+    return { status: "error", message: "Couldn't remove the video. Please try again." };
+  }
+  updateTag(SITE_SETTINGS_TAG);
+  if (previous) await supabase.storage.from(SITE_MEDIA_BUCKET).remove([previous.srcPath, previous.posterPath]).catch(() => {});
+  return { status: "success", message: "Removed. The home page is back to the default video." };
 }
